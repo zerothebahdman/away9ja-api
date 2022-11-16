@@ -12,10 +12,10 @@
 1. `cd` into whatever directory you want work from.
 2. Run `git clone https://github.com/Tratrust-Limited/PG-BACK-OFFICE-API.git` then `cd` into the repo.
 3. After cloning the project, run `cp .env .env.example` on your terminal to create a new `.env` file from the `.env.example`.
-4. Run `npm install` || `npm i` to install all the dependencies.
-5. Run `npm run dev` to start the project in development mode.
-6. Run `npm run build` to build the project for production.
-7. Run `npm run start` to start the project in production mode.
+4. Run `yarn install` to install all the dependencies.
+5. Run `yarn dev` to start the project in development mode.
+6. Run `yarn build` to build the project for production.
+7. Run `yarn start` to start the project in production mode.
 
 ## Project Setup
 

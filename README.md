@@ -10,7 +10,7 @@
 ## Project Installation
 
 1. `cd` into whatever directory you want work from.
-2. Run `git clone https://github.com/Tratrust-Limited/PG-BACK-OFFICE-API.git` then `cd` into the repo.
+2. Run `https://github.com/AwayNaija/awaynaija-api.git` then `cd` into the repo.
 3. After cloning the project, run `cp .env .env.example` on your terminal to create a new `.env` file from the `.env.example`.
 4. Run `yarn install` to install all the dependencies.
 5. Run `yarn dev` to start the project in development mode.

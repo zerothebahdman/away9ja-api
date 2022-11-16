@@ -1,48 +1,51 @@
 import { Request, Response, NextFunction } from 'express';
-import UserService, { User } from '../services/User.service';
 import AppException from '../exceptions/AppException';
-
-import { PrismaClient } from '@prisma/client';
-import log from '../logging/logger';
 import EmailService from '../services/Email.service';
-import TokenService from '../services/Token.service';
-
-const { user } = new PrismaClient();
+import httpStatus from 'http-status';
+import prisma from '../database/model.module';
+import AuthService from '../services/Auth.service';
 const emailService = new EmailService();
 
 export default class CreateUser {
-  async createUser(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly authService: AuthService) {}
+
+  async createUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response<any, Record<string, any>>> {
     try {
-      const _userExists = await user.findUnique({
+      const _userExists = await prisma.user.findUnique({
         where: { email: req.body.email },
       });
 
       if (_userExists)
         return next(
-          new AppException(`Opps!, ${_userExists.email} is taken`, 422)
+          new AppException(`Oops!, ${_userExists.email} is taken`, 422)
         );
 
       /** if user does not exist create the user using the user service */
-      const { _user, jwtToken, emailVerificationToken }: any =
-        await UserService.createUser(req.body, next);
+      const { user, OTP_CODE } = await this.authService.createUser(req.body);
 
-      /** Send email verfication to user */
+      /** Send email verification to user */
       await emailService._sendUserEmailVerificationEmail(
-        _user.name,
-        _user.email,
-        emailVerificationToken,
-        req
+        user.fullName,
+        user.email,
+        OTP_CODE
       );
 
-      res.status(200).json({
+      return res.status(httpStatus.OK).json({
         status: 'success',
         message: `We've sent an verification email to your mail`,
-        jwtToken: jwtToken,
-        user: _user,
+        user,
       });
     } catch (err: any) {
-      log.error(err);
-      return next(new AppException(err.message, err.status));
+      return next(
+        new AppException(
+          err.message,
+          err.status || httpStatus.INTERNAL_SERVER_ERROR
+        )
+      );
     }
   }
 }

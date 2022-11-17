@@ -139,5 +139,3 @@ export default class AuthService {
     return OTP_CODE;
   }
 }
-// 7ff4f4140a803e84097216ff0b8e6ca080ecb3d4
-// bf08317363a41c2d562c01d2b9c427c87ab61019

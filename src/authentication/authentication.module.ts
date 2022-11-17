@@ -10,6 +10,7 @@ import TokenService from '../services/Token.service';
 import EncryptionService from '../services/Encryption.service';
 import PasswordReset from './PasswordReset';
 import EmailService from '../services/Email.service';
+import UserService from '../services/User.service';
 
 export const createUser = new CreateUser(
   new AuthService(new EncryptionService(), new TokenService())
@@ -17,7 +18,10 @@ export const createUser = new CreateUser(
 export const loginUser = new LoginUser(
   new AuthService(new EncryptionService(), new TokenService())
 );
-export const verifyUserEmail = new VerifyUserEmail();
+export const verifyUserEmail = new VerifyUserEmail(
+  new TokenService(),
+  new UserService()
+);
 export const passwordReset = new PasswordReset(
   new TokenService(),
   new EmailService(),

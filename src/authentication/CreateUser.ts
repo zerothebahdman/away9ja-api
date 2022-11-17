@@ -4,6 +4,8 @@ import EmailService from '../services/Email.service';
 import httpStatus from 'http-status';
 import prisma from '../database/model.module';
 import AuthService from '../services/Auth.service';
+import RESERVED_NAMES from '../utils/reservedNames';
+import HelperClass from '../utils/helper';
 const emailService = new EmailService();
 
 export default class CreateUser {
@@ -18,11 +20,17 @@ export default class CreateUser {
       const _userExists = await prisma.user.findUnique({
         where: { email: req.body.email },
       });
+      delete req.body.confirmPassword;
+      if (_userExists) throw new Error(`Oops!, ${_userExists.email} is taken`);
 
-      if (_userExists)
-        return next(
-          new AppException(`Oops!, ${_userExists.email} is taken`, 422)
-        );
+      // check that the username is in the right format
+      HelperClass.userNameValidator(req.body.username);
+
+      // Reserved usernames
+      if (RESERVED_NAMES.includes(req.body.username))
+        throw new Error('Username unavailable, please choose another username');
+
+      req.body.referalCode = HelperClass.generateRandomChar(6, 'upper-num');
 
       /** if user does not exist create the user using the user service */
       const { user, OTP_CODE } = await this.authService.createUser(req.body);
@@ -41,10 +49,7 @@ export default class CreateUser {
       });
     } catch (err: any) {
       return next(
-        new AppException(
-          err.message,
-          err.status || httpStatus.INTERNAL_SERVER_ERROR
-        )
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST)
       );
     }
   }

@@ -32,7 +32,6 @@ export default class VerifyUserEmail {
           isEmailVerified: false,
           emailVerificationToken: _hashedEmailToken,
         },
-        select: { id: true, fullName: true, email: true },
       });
 
       if (!user) return TokenMustStillBeValid(next);

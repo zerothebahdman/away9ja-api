@@ -13,25 +13,21 @@ export const LoginValidator = {
         'any.email': 'Oops!, you need to provide valid email address',
         'any.required': 'Oops!, you have to specify an email address',
       }),
-    password: Joi.string().min(8).required(),
+    password: Joi.string().min(8).required().messages({
+      'string.min': 'Oops!, password must be at least 8 characters long',
+      'any.required': 'Oops!, you have to specify a password',
+    }),
   }),
 };
 
 export const CreateUserValidator = {
   body: Joi.object().keys({
-    firstName: Joi.string().min(3).lowercase().max(40).required(),
-    lastName: Joi.string().min(3).lowercase().max(40).required(),
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: { allow: ['com', 'net'] },
-      })
-      .lowercase()
-      .required()
-      .messages({
-        'string.email': 'Oops!, you need to provide valid email address',
-        'string.required': 'Oops!, you have to specify an email address',
-      }),
+    fullName: Joi.string().min(3).lowercase().max(40).required(),
+    username: Joi.string().min(3).lowercase().max(40).required(),
+    email: Joi.string().email().lowercase().required().messages({
+      'string.email': 'Oops!, you need to provide valid email address',
+      'string.required': 'Oops!, you have to specify an email address',
+    }),
     phoneNumber: Joi.string().max(12).strict().required().messages({
       'string.required': 'Oops!, you have to specify an email address',
     }),
@@ -41,12 +37,9 @@ export const CreateUserValidator = {
       .required(),
     confirmPassword: Joi.ref('password'),
     gender: Joi.string().required().valid('male', 'female'),
-    role: Joi.string()
-      .required()
-      .valid('PARENT', 'SCHOOL', 'ADMIN')
-      .uppercase(),
     address: Joi.string().required().lowercase(),
-    image: Joi.string(),
+    stateOfOrigin: Joi.string().required().lowercase(),
+    inviteCode: Joi.string().optional().lowercase(),
   }),
 };
 
@@ -75,7 +68,29 @@ export const RegenerateAccessToken = {
 export const ResetPasswordValidator = {
   body: Joi.object().keys({
     password: Joi.string().min(8).required(),
-    confirm_password: Joi.ref('password'),
+    confirmPassword: Joi.ref('password'),
     token: Joi.string().required(),
+  }),
+};
+
+export const verifyUserEmailValidator = {
+  body: Joi.object().keys({
+    otp: Joi.string().required(),
+  }),
+};
+
+export const forgotPasswordValidator = {
+  body: Joi.object().keys({
+    email: Joi.string().email().lowercase().required().messages({
+      'any.required': 'Oops!, you have to specify an email address',
+    }),
+  }),
+};
+
+export const resendOtpValidator = {
+  body: Joi.object().keys({
+    email: Joi.string().email().lowercase().required().messages({
+      'any.required': 'Oops!, you have to specify an email address',
+    }),
   }),
 };

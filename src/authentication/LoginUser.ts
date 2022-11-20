@@ -66,10 +66,20 @@ export default class LoginUser {
 
   async resendOtp(req: Request, res: Response, next: NextFunction) {
     try {
-      await this.authService.resendOtp({ req: req.body, next });
+      const _user: User = await this.userService.getUserByEmail(req.body.email);
+      if (!_user)
+        next(
+          new AppException('Oops!, user does not exist', httpStatus.NOT_FOUND)
+        );
+      if (_user.isEmailVerified === true)
+        new Error(`Oops!, email has already been verified`);
+
+      await this.authService.resendOtp(_user);
       return res.status(httpStatus.NO_CONTENT).send();
     } catch (err: any) {
-      return next(new AppException(err.status, err.message));
+      return next(
+        new AppException(err.status, err.message || httpStatus.FORBIDDEN)
+      );
     }
   }
 }

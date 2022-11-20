@@ -1,48 +1,56 @@
 import { Request, Response, NextFunction } from 'express';
-import UserService, { User } from '../services/User.service';
 import AppException from '../exceptions/AppException';
-
-import { PrismaClient } from '@prisma/client';
-import log from '../logging/logger';
 import EmailService from '../services/Email.service';
-import TokenService from '../services/Token.service';
-
-const { user } = new PrismaClient();
+import httpStatus from 'http-status';
+import prisma from '../database/model.module';
+import AuthService from '../services/Auth.service';
+import RESERVED_NAMES from '../utils/reservedNames';
+import HelperClass from '../utils/helper';
 const emailService = new EmailService();
 
 export default class CreateUser {
-  async createUser(req: Request, res: Response, next: NextFunction) {
+  constructor(private readonly authService: AuthService) {}
+
+  async createUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response<any, Record<string, any>>> {
     try {
-      const _userExists = await user.findUnique({
+      const _userExists = await prisma.user.findUnique({
         where: { email: req.body.email },
       });
+      delete req.body.confirmPassword;
+      if (_userExists) throw new Error(`Oops!, ${_userExists.email} is taken`);
 
-      if (_userExists)
-        return next(
-          new AppException(`Opps!, ${_userExists.email} is taken`, 422)
-        );
+      // check that the username is in the right format
+      HelperClass.userNameValidator(req.body.username);
+
+      // Reserved usernames
+      if (RESERVED_NAMES.includes(req.body.username))
+        throw new Error('Username unavailable, please choose another username');
+
+      req.body.referalCode = HelperClass.generateRandomChar(6, 'upper-num');
 
       /** if user does not exist create the user using the user service */
-      const { _user, jwtToken, emailVerificationToken }: any =
-        await UserService.createUser(req.body, next);
+      const { user, OTP_CODE } = await this.authService.createUser(req.body);
 
-      /** Send email verfication to user */
+      /** Send email verification to user */
       await emailService._sendUserEmailVerificationEmail(
-        _user.name,
-        _user.email,
-        emailVerificationToken,
-        req
+        user.fullName,
+        user.email,
+        OTP_CODE
       );
 
-      res.status(200).json({
+      return res.status(httpStatus.OK).json({
         status: 'success',
         message: `We've sent an verification email to your mail`,
-        jwtToken: jwtToken,
-        user: _user,
+        user,
       });
     } catch (err: any) {
-      log.error(err);
-      return next(new AppException(err.message, err.status));
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST)
+      );
     }
   }
 }

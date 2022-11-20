@@ -1,18 +1,19 @@
-import { NextFunction } from 'express';
-import AppException from '../exceptions/AppException';
 import EncryptionService from './Encryption.service';
 import TokenService from './Token.service';
-import httpStatus from 'http-status';
 import prisma from '../database/model.module';
 import { User } from '@prisma/client';
 import HelperClass from '../utils/helper';
 import { createHash } from 'node:crypto';
 import moment from 'moment';
+import UserService from './User.service';
+import EmailService from './Email.service';
 
 export default class AuthService {
   constructor(
     private readonly encryptionService: EncryptionService,
-    private readonly tokenService: TokenService
+    private readonly tokenService: TokenService,
+    private readonly userService: UserService,
+    private readonly emailService: EmailService
   ) {}
 
   async createUser(
@@ -36,106 +37,51 @@ export default class AuthService {
     return { user, OTP_CODE };
   }
 
-  async loginUser(loginPayload: User, next: NextFunction) {
-    const _userExists: User = await prisma.user.findUnique({
-      where: { email: loginPayload.email },
-    });
-
-    if (
-      !_userExists ||
-      !(await this.encryptionService.comparePassword(
-        _userExists.password,
-        loginPayload.password
-      ))
-    )
-      next(new AppException(`Oops!, Incorrect email or password`, 401));
-
-    if (_userExists.isEmailVerified !== true)
-      next(
-        new AppException(
-          'Oops! email address is not verified',
-          httpStatus.FORBIDDEN
-        )
-      );
-
-    const accessToken = await this.tokenService._generateAccessToken(
-      _userExists.id,
-      _userExists.fullName
-    );
-    const refreshToken = await this.tokenService._generateRefreshToken(
-      _userExists.id,
-      _userExists.fullName
+  async loginUser(loginPayload: User) {
+    const token = await this.tokenService.generateToken(
+      loginPayload.id,
+      loginPayload.fullName
     );
 
-    return { accessToken, refreshToken, user: _userExists };
+    return token;
   }
 
-  async regenerateAccessToken(
-    refreshToken: string,
-    next: NextFunction
-  ): Promise<string> {
-    const decodeToken = await new TokenService().verifyToken(
-      refreshToken,
-      next
-    );
+  async regenerateAccessToken(refreshToken: string): Promise<string> {
+    const decodeToken = await new TokenService().verifyToken(refreshToken);
     const { sub }: any = decodeToken;
-    const user = await prisma.user.findById({ _id: sub });
+    const user = await prisma.user.findUnique({ where: { id: sub } });
 
-    if (!user)
-      next(
-        new AppException('Oops!, user does not exist', httpStatus.NOT_FOUND)
-      );
+    if (!user) throw new Error(`Oops!, user with id ${sub} does not exist`);
 
-    return await this.tokenService._generateAccessToken(
+    const { accessToken } = await this.tokenService.generateToken(
       user.id,
-      user.firstName
+      user.email
     );
+
+    return accessToken;
   }
 
-  async resendOtp({
-    req,
-    next,
-  }: {
-    req: User;
-    next: NextFunction;
-  }): Promise<string> {
-    const _user: User = await prisma.user.findOne({
-      email: req.email,
-      deletedAt: null,
+  async resendOtp(actor: User): Promise<void> {
+    const otp = HelperClass.generateRandomChar(6, 'num');
+    const hashedToken = await this.encryptionService.hashString(otp);
+
+    await prisma.user.update({
+      where: { id: actor.id },
+      data: {
+        emailVerificationToken: hashedToken,
+        emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),
+      },
     });
-    if (!_user)
-      next(
-        new AppException('Oops!, user does not exist', httpStatus.NOT_FOUND)
-      );
+    const updateBody: any = {
+      emailVerificationToken: hashedToken,
+      emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),
+    };
+    await this.userService.updateUserById(actor.id, updateBody);
 
-    const OTP_CODE = HelperClass.generateRandomChar(6, 'num');
-    if (_user.isEmailVerified === true) {
-      next(
-        new AppException(
-          'Oops!, email is already verified',
-          httpStatus.FORBIDDEN
-        )
-      );
-    } else {
-      const hashedOtp = this.encryptionService.hashString(OTP_CODE);
-
-      await prisma.user.update({
-        where: { id: Number(_user.id) },
-        data: {
-          emailVerificationToken: hashedOtp,
-          emailVerificationTokenExpiry: moment()
-            .add('6', 'hours')
-            .utc()
-            .toDate(),
-        },
-      });
-
-      // await this.emailService._sendUserEmailVerificationEmail(
-      //   _user.firstName,
-      //   _user.email,
-      //   OTP_CODE
-      // );
-    }
-    return OTP_CODE;
+    await this.emailService._sendUserEmailVerificationEmail(
+      actor.fullName,
+      actor.email,
+      otp
+    );
   }
 }

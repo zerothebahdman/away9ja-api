@@ -13,10 +13,20 @@ import EmailService from '../services/Email.service';
 import UserService from '../services/User.service';
 
 export const createUser = new CreateUser(
-  new AuthService(new EncryptionService(), new TokenService())
+  new AuthService(
+    new EncryptionService(),
+    new TokenService(),
+    new UserService(),
+    new EmailService()
+  )
 );
 export const loginUser = new LoginUser(
-  new AuthService(new EncryptionService(), new TokenService()),
+  new AuthService(
+    new EncryptionService(),
+    new TokenService(),
+    new UserService(),
+    new EmailService()
+  ),
   new UserService(),
   new EncryptionService()
 );

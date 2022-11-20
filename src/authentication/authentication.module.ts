@@ -19,8 +19,8 @@ export const loginUser = new LoginUser(
   new AuthService(new EncryptionService(), new TokenService())
 );
 export const verifyUserEmail = new VerifyUserEmail(
-  new TokenService(),
-  new UserService()
+  new UserService(),
+  new EncryptionService()
 );
 export const passwordReset = new PasswordReset(
   new TokenService(),

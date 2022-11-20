@@ -1,63 +1,60 @@
 import { NextFunction, Request, Response } from 'express';
-import { createHash } from 'node:crypto';
-import { PrismaClient } from '@prisma/client';
 import { TokenMustStillBeValid } from './rules/rules.module';
 import AppException from '../exceptions/AppException';
-import log from '../logging/logger';
-import TokenService from '../services/Token.service';
-import { User } from '../services/User.service';
-
-const { user } = new PrismaClient();
+import moment from 'moment';
+import prisma from '../database/model.module';
+import UserService from '../services/User.service';
+import { User } from '@prisma/client';
+import httpStatus from 'http-status';
+import EncryptionService from '../services/Encryption.service';
 
 export default class VerifyUserEmail {
+  constructor(
+    private readonly userService: UserService,
+    private readonly encryptionService: EncryptionService
+  ) {}
   async execute(req: Request, res: Response, next: NextFunction) {
     try {
-      /** Check if the hashed token sent to the user has not being tampered with*/
-      const _hashedEmailToken: string = createHash('sha512')
-        .update(req.params.token)
-        .digest('base64');
-
-      /** Check if the token is the same with the one stores in the database
-       * check if the email has not beign verified
+      /**
+       * Check if the hashed token sent to the user has not being tampered with
+       * Check if the token is the same with the one stores in the database
+       * check if the email has not being verified
        * check if the token has expired
+       * set emailVerificationToken and emailVerificationTokenExpiry field to null
        */
-      let _user: User = null;
 
-      _user = await user.findFirst({
+      const _hashedEmailToken: string = await this.encryptionService.hashString(
+        req.body.otp
+      );
+
+      const user: User = await prisma.user.findFirst({
         where: {
           isEmailVerified: false,
-          token: _hashedEmailToken,
-          token_expires_at: { gt: new Date(Date.now()) },
+          emailVerificationToken: _hashedEmailToken,
         },
-        select: { id: true, name: true, email: true },
+        select: { id: true, fullName: true, email: true },
       });
 
-      if (!_user) return TokenMustStillBeValid(next);
+      if (!user) return TokenMustStillBeValid(next);
+      if (user.emailVerificationTokenExpiry < moment().utc().toDate())
+        throw new Error(`Oops!, your token has expired`);
 
-      /** Veiry user email
-       * set token and token_expires_at field to null cause its no longer needed
-       */
-      await user.update({
-        where: { id: _user.id },
-        data: {
-          isEmailVerified: true,
-          email_verified_at: new Date(Date.now()),
-          token: null,
-          token_expires_at: null,
-        },
-      });
+      const data: any = {
+        isEmailVerified: true,
+        emailVerifiedAt: moment().utc().toDate(),
+        emailVerificationToken: null,
+        emailVerificationTokenExpiry: null,
+      };
+      await this.userService.updateUserById(user.id, data);
 
-      /** Genereate a new JWT token*/
-      const token = await TokenService._generateJwtToken(_user.id);
-
-      return res.status(201).json({
+      return res.status(httpStatus.OK).json({
         status: `success`,
-        message: `Your email: ${_user.email} has been verified`,
-        token,
+        message: `Your email: ${user.email} has been verified`,
       });
     } catch (err: any) {
-      log.error(err);
-      return next(new AppException(err.message, err.status));
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST)
+      );
     }
   }
 }

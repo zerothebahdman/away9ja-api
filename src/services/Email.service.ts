@@ -1,92 +1,97 @@
-import { resolve } from 'node:path';
-import Email from 'email-templates';
-import config from 'config';
+import config from '../../config/default';
 import NodemailerModule from '../modules/NodemailerModule';
 import log from '../logging/logger';
-import { User } from './User.service';
-import { Request } from 'express';
+import PASSWORD_RESET_EMAIL from '../mail/password-reset';
+import WELCOME_EMAIL from '../mail/welcome-email';
+import EMAIL_VERIFICATION from '../mail/email-verification';
+import HelperClass from '../utils/helper';
 const _nodeMailerModule = new NodemailerModule();
+
+const emailType: EmailType = {
+  WELCOME_EMAIL: ['Welcome to Away Naija', 'welcome'],
+  PASSWORD_RESET_INSTRUCTION: ['Password Reset Requested', 'password-reset'],
+  PASSWORD_RESET_SUCCESSFUL: ['Password Reset', 'password-reset-successful'],
+  EMAIL_VERIFICATION: ['Email Verification Requested', 'email-verification'],
+  PASSWORD_CHANGED: ['Password Changed', 'password-changed'],
+};
+
+type Data = {
+  fullName?: string;
+  url?: string;
+  password?: string;
+  token?: string;
+};
+
+type EmailOptions = {
+  from: string;
+  to: string;
+  html?: any;
+  fullName?: string;
+  subject?: string;
+};
 
 type EmailType = {
   [k: string]: string[];
 };
-
-const email = new Email({
-  juice: true,
-  juiceSettings: { tableElements: ['TABLE'] },
-  juiceResources: {
-    preserveImportant: true,
-    webResources: {
-      relativeTo: resolve('public/email'),
-    },
-  },
-  views: {
-    root: resolve('public/email'),
-    options: {
-      extension: 'ejs',
-    },
-  },
-});
-
-const emailType: EmailType = {
-  WELCOME_EMAIL: ['Welcome to Clean Nodejs Boilerplate', 'welcome'],
-  PASSWORD_RESET_INSTRUCTION: ['Password Reset Requested', 'password-reset'],
-  PASSWORD_RESET_SUCCESSFUL: ['Password Reset', 'password-reset-successful'],
-  PASSWORD_CHANGED: ['Password Changed', 'password-changed'],
-  EMAIL_VERIFICATION: ['Email Verification Requested', 'email-verification'],
-};
-
-type Data = { _user_name: string; verificationUrl: string };
-
 export default class EmailService {
-  /** Send email takes the following arguements:
+  /** Send email takes the following parameters:
    * type - refers to the type of the email eg WelcomeEmail
    * to - refers to who you are sending the email to
    * data - refers to what you want to send to the user
    */
-  async _sendEmail(type: string, users_email: string, data: Data) {
-    // if (config.get<string>('env') === 'development')
-    //   return `Email sent to ${to}`;
+  async _sendMail(type: string, email: string, data: Data) {
+    const mailOptions: EmailOptions = {
+      from: config.from,
+      to: email,
+    };
     const [subject, templatePath] = emailType[type] || [];
     if (!subject || !templatePath) return;
-    const html = await email.render(`templates/${templatePath}`, data);
+    switch (templatePath) {
+      case 'welcome':
+        mailOptions.html = WELCOME_EMAIL(data.fullName, data.url);
+        mailOptions.subject = `${subject} ${data.fullName}`;
+        break;
+      case 'password-reset':
+        mailOptions.html = PASSWORD_RESET_EMAIL(data.fullName, data.token);
+        mailOptions.subject = `[URGENT] - ${subject}`;
+        break;
+      case 'email-verification':
+        mailOptions.html = EMAIL_VERIFICATION(data.fullName, data.token);
+        mailOptions.subject = `[Away Naija] ${subject}`;
+        break;
+    }
     try {
-      await _nodeMailerModule.send({
-        from: config.get<string>('from'),
-        to: users_email,
-        html,
-        name: config.get<string>('name'),
-        subject,
-      });
-      log.info(`Email sent to ${users_email}`);
+      await _nodeMailerModule.send(mailOptions);
+      log.info(`Email on it's way to ${email}`);
     } catch (err) {
       throw err;
     }
   }
 
-  async _sendWelcomeEmail() {}
+  async _sendWelcomeEmail(fullName: string, email: string) {
+    const url = `${config.FRONTEND_APP_URL}/sign-in`;
+    return await this._sendMail('WELCOME_EMAIL', email, { fullName, url });
+  }
 
   async _sendUserEmailVerificationEmail(
-    _user_name: string,
-    _user_email: string,
-    token: string,
-    req: Request
+    fullName: string,
+    email: string,
+    token: string
   ) {
-    const verificationUrl = `${req.protocol}://${req.get(
-      'host'
-    )}/api/v1/user/verify-email/${token}`;
-
-    log.info(verificationUrl);
-
-    return await this._sendEmail('EMAIL_VERIFICATION', _user_email, {
-      _user_name,
-      verificationUrl,
+    return await this._sendMail('EMAIL_VERIFICATION', email, {
+      fullName,
+      token,
     });
   }
 
-  async _sendUserPasswordResetInstructionEmail() {}
-
-  async _sendPasswordResetSuccessfulEmail() {}
-
-  async _sendUserPasswordChangedEmail() {}
+  async _sendUserPasswordResetInstructionEmail(
+    fullName: string,
+    email: string,
+    token: string
+  ) {
+    return await this._sendMail('PASSWORD_RESET_INSTRUCTION', email, {
+      fullName,
+      token,
+    });
+  }
 }

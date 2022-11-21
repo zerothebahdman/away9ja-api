@@ -65,13 +65,6 @@ export default class AuthService {
     const otp = HelperClass.generateRandomChar(6, 'num');
     const hashedToken = await this.encryptionService.hashString(otp);
 
-    await prisma.user.update({
-      where: { id: actor.id },
-      data: {
-        emailVerificationToken: hashedToken,
-        emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),
-      },
-    });
     const updateBody: any = {
       emailVerificationToken: hashedToken,
       emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),

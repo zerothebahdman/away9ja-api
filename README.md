@@ -22,7 +22,7 @@
 1. Create a database on your machine.
 
 - For **PostgreSQL**
-  - Navigate into `src/database/prisma/schema.prisma` verify that inside the datasource db object provider is set to mysql i.e `provider = "postgresql"`
+  - Navigate into `src/database/prisma/schema.prisma` verify that inside the datasource db object provider is set to postgresql i.e `provider = "postgresql"`
 
 ```bash
 Your database url in the `.env` file should as follows
@@ -53,7 +53,3 @@ Dont forget to star or fork this if you like it
 [![license](https://img.shields.io/badge/license-GPL-4dc71f.svg)](https://github.com/codewithdiv/nodejs-boilerplate/blob/main/LICENCE)
 
 This project is licensed under the terms of the [GPL license](/LICENSE).
-
-```
-
-```

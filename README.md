@@ -22,7 +22,7 @@
 1. Create a database on your machine.
 
 - For **PostgreSQL**
-  - Navigate into `src/database/prisma/schema.prisma` verify that inside the datasource db object provider is set to mysql i.e `provider = "postgresql"`
+  - Navigate into `src/database/prisma/schema.prisma` verify that inside the datasource db object provider is set to postgresql i.e `provider = "postgresql"`
 
 ```bash
 Your database url in the `.env` file should as follows

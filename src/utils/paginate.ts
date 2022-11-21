@@ -1,4 +1,8 @@
-async function paginate<T>(filter: any, options: any, model: T) {
+async function paginate<T>(
+  filter: any,
+  options: { orderBy: any; page: string; limit: string; populate: string },
+  model: T
+) {
   /**
    * 1. check if orderBy is provided in the options,m if it exists, then use it to sort the data in whatever order is provided else use the default order
    * 2. check if limit is provided in the options, if it exists, then use it to limit the number of data returned else use the default limit

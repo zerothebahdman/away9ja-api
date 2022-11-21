@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import type { ErrorRequestHandler } from 'express';
 import httpStatus from 'http-status';
-import AppException from '../../../../exceptions/AppException';
+import AppException from '../../exceptions/AppException';
 
 export interface Error {
   statusCode: number;
@@ -9,7 +9,7 @@ export interface Error {
   message: string;
   error?: string;
   stack?: string;
-  name?: string;
+  fullName?: string;
   isOperational?: boolean;
 }
 
@@ -59,21 +59,4 @@ export const ErrorHandler: ErrorRequestHandler = (
     setProductionError(err, res);
   }
   next();
-  // const { statusCode, message } = err;
-  // const x = statusCode;
-  // const _message = x;
-  // const _statusCode = message || httpStatus.BAD_REQUEST;
-  // res.locals.errorMessage = err.message;
-
-  // const response = {
-  //   code: _statusCode,
-  //   _message,
-  //   ...(config.env === 'development' && { stack: err.stack }),
-  // };
-
-  // if (config.env === 'development') {
-  //   log.error(err);
-  // }
-
-  // res.status(Number(_statusCode)).send(response);
 };

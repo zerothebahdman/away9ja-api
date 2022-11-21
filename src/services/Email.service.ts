@@ -4,7 +4,6 @@ import log from '../logging/logger';
 import PASSWORD_RESET_EMAIL from '../mail/password-reset';
 import WELCOME_EMAIL from '../mail/welcome-email';
 import EMAIL_VERIFICATION from '../mail/email-verification';
-import HelperClass from '../utils/helper';
 const _nodeMailerModule = new NodemailerModule();
 
 const emailType: EmailType = {

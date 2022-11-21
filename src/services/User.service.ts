@@ -5,12 +5,12 @@ import paginate from '../utils/paginate';
 export default class UserService {
   async getAllUsers(
     filter: User,
-    options: Object = {},
+    options: any = {},
     ignorePagination = false
   ): Promise<User[]> {
     const data = ignorePagination
       ? await prisma.user.findMany()
-      : await paginate<User>(filter, options, prisma.user);
+      : await paginate<typeof prisma.user>(filter, options, prisma.user);
     return data;
   }
 

@@ -53,7 +53,3 @@ Dont forget to star or fork this if you like it
 [![license](https://img.shields.io/badge/license-GPL-4dc71f.svg)](https://github.com/codewithdiv/nodejs-boilerplate/blob/main/LICENCE)
 
 This project is licensed under the terms of the [GPL license](/LICENSE).
-
-```
-
-```

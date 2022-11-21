@@ -6,30 +6,35 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                Int       @id @default(autoincrement())
-  // id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // id                           Int       @id @default(autoincrement())
+  id                           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  name              String    @db.VarChar(255)
-  email             String    @unique @db.VarChar(255)
-  password          String    @db.VarChar(255)
-  phone_number      String    @db.VarChar(255)
-  gender            Gender?   @default(male)
-  address           String?   @db.VarChar(255)
-  isEmailVerified   Boolean?  @default(false)
-  email_verified_at DateTime?
-  token             String?   @unique @db.VarChar(255)
-  token_expires_at  DateTime?
-  passwordLastReset DateTime?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime? @updatedAt
-  deleted_at        DateTime?
+  fullName                     String    @db.VarChar(255)
+  username                     String    @unique @db.VarChar(255)
+  email                        String    @unique @db.VarChar(255)
+  password                     String    @db.VarChar(255)
+  phoneNumber                  String    @db.VarChar(255)
+  gender                       Gender    @default(male)
+  address                      String    @db.VarChar(255)
+  stateOfOrigin                String    @db.VarChar(255)
+  referalCode                  String?   @unique @db.VarChar(255)
+  inviteCode                   String?   @unique @db.VarChar(255)
+  isEmailVerified              Boolean?  @default(false)
+  emailVerifiedAt              DateTime?
+  emailVerificationToken       String?   @db.VarChar(255)
+  emailVerificationTokenExpiry DateTime?
+  passwordResetToken           String?   @unique @db.VarChar(255)
+  passwordResetTokenExpiresAt  DateTime?
+  createdAt                    DateTime  @default(now())
+  updateAt                     DateTime? @updatedAt
+  deletedAt                    DateTime?
 
-  @@map("user")
+  @@map("Users")
 }
 
 enum Gender {

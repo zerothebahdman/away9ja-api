@@ -43,7 +43,7 @@ async function paginate<T>(filter: any, options: any, model: T) {
   const skip = (page - 1) * limit;
 
   // @ts-ignore
-  const countPages = await model.count(filter);
+  const countPages = await model.count({ where: { filter } });
 
   const populate: Object[] = [];
   if (options.populate) {

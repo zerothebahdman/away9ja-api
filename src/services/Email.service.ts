@@ -15,10 +15,7 @@ const emailType: EmailType = {
 };
 
 type Data = {
-  fullName?: string;
-  url?: string;
-  password?: string;
-  token?: string;
+  [T: string]: string;
 };
 
 type EmailOptions = {

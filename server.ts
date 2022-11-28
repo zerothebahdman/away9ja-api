@@ -1,8 +1,8 @@
-import config from 'config';
 import app from './src/http/app';
 import log from './src/logging/logger';
+import config from './config/default';
 
-const port: number = config.get<number>('port');
+const port: number = config.port || 8080;
 
 const server = app.listen(port, () => {
   log.info(`App is running on port ${port}`);

@@ -11,7 +11,7 @@ const server = app.listen(port, () => {
 const exitHandler = () => {
   if (server) {
     server.close(() => {
-      log.info('Server closed');
+      log.error('Server closed');
       process.exit(1);
     });
   } else {

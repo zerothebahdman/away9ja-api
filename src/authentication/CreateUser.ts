@@ -17,11 +17,16 @@ export default class CreateUser {
     next: NextFunction
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
-      const _userExists = await prisma.user.findUnique({
+      const emailTaken = await prisma.user.findUnique({
         where: { email: req.body.email },
       });
+      const userNameTaken = await prisma.user.findUnique({
+        where: { username: req.body.username },
+      });
       delete req.body.confirmPassword;
-      if (_userExists) throw new Error(`Oops!, ${_userExists.email} is taken`);
+      if (emailTaken) throw new Error(`Oops!, ${emailTaken.email} is taken`);
+      if (userNameTaken)
+        throw new Error(`Oops!, ${userNameTaken.username} is taken`);
 
       // check that the username is in the right format
       HelperClass.userNameValidator(req.body.username);

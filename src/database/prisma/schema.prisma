@@ -13,29 +13,91 @@ datasource db {
 
 model User {
   // id                           Int       @id @default(autoincrement())
-  id                           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  fullName                     String    @db.VarChar(255)
-  username                     String    @unique @db.VarChar(255)
-  email                        String    @unique @db.VarChar(255)
-  password                     String    @db.VarChar(255)
-  phoneNumber                  String    @db.VarChar(255)
-  gender                       Gender    @default(male)
-  address                      String    @db.VarChar(255)
-  stateOfOrigin                String    @db.VarChar(255)
-  referalCode                  String?   @unique @db.VarChar(255)
-  inviteCode                   String?   @unique @db.VarChar(255)
-  isEmailVerified              Boolean?  @default(false)
+  fullName                     String         @db.VarChar(255)
+  username                     String         @unique @db.VarChar(255)
+  email                        String         @unique @db.VarChar(255)
+  password                     String         @db.VarChar(255)
+  phoneNumber                  String         @db.VarChar(255)
+  gender                       Gender         @default(male)
+  address                      String         @db.VarChar(255)
+  stateOfOrigin                String         @db.VarChar(255)
+  referalCode                  String?        @unique @db.VarChar(255)
+  inviteCode                   String?        @unique @db.VarChar(255)
+  isEmailVerified              Boolean?       @default(false)
   emailVerifiedAt              DateTime?
-  emailVerificationToken       String?   @db.VarChar(255)
+  emailVerificationToken       String?        @db.VarChar(255)
   emailVerificationTokenExpiry DateTime?
-  passwordResetToken           String?   @unique @db.VarChar(255)
+  passwordResetToken           String?        @unique @db.VarChar(255)
   passwordResetTokenExpiresAt  DateTime?
-  createdAt                    DateTime  @default(now())
-  updateAt                     DateTime? @updatedAt
+  createdAt                    DateTime       @default(now())
+  updateAt                     DateTime?      @updatedAt
   deletedAt                    DateTime?
+  posts                        Post[]
+  post_comment                 Post_Comment[]
+  post_likes                   post_likes[]
 
   @@map("Users")
+}
+
+model Post {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body         String         @db.VarChar(255)
+  User         User?          @relation(fields: [user_id], references: [id])
+  user_id      String?        @db.Uuid
+  images       String[]
+  tags         String[]
+  location     String?
+  createdAt    DateTime       @default(now())
+  updateAt     DateTime?      @updatedAt
+  deletedAt    DateTime?
+  Post_Comment Post_Comment[]
+  post_likes   post_likes[]
+
+  @@map("Posts")
+}
+
+model Post_Comment {
+  id                  String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body                String                 @db.VarChar(255)
+  User                User?                  @relation(fields: [user_id], references: [id])
+  user_id             String?                @db.Uuid
+  Post                Post?                  @relation(fields: [post_id], references: [id])
+  post_id             String?                @db.Uuid
+  createdAt           DateTime               @default(now())
+  updateAt            DateTime?              @updatedAt
+  deletedAt           DateTime?
+  parent_post_comment parent_child_comment[] @relation("parent_post_comment")
+  child_post_comment  parent_child_comment[] @relation("child_post_comment")
+
+  @@map("Post_Comments")
+}
+
+model post_likes {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  User      User?     @relation(fields: [user_id], references: [id])
+  user_id   String?   @db.Uuid
+  Post      Post?     @relation(fields: [post_id], references: [id])
+  post_id   String?   @db.Uuid
+  createdAt DateTime  @default(now())
+  updateAt  DateTime? @updatedAt
+  deletedAt DateTime?
+
+  @@map("post_likes")
+}
+
+model parent_child_comment {
+  id                     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_post_comment    Post_Comment? @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment")
+  parent_post_comment_id String?       @db.Uuid
+  child_post_comment     Post_Comment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment")
+  child_post_comment_id  String?       @db.Uuid
+  createdAt              DateTime      @default(now())
+  updateAt               DateTime?     @updatedAt
+  deletedAt              DateTime?
+
+  @@map("parent_child_comments")
 }
 
 enum Gender {

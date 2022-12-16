@@ -55,6 +55,11 @@
     "@types/node": "^17.0.21",
     "@types/nodemailer": "^6.4.4",
     "@types/pino-pretty": "^4.7.5",
+    "@typescript-eslint/eslint-plugin": "^5.46.1",
+    "@typescript-eslint/parser": "^5.46.1",
+    "eslint": "^8.29.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.8.1",
     "prisma": "^4.6.1"
   }
 }

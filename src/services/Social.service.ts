@@ -1,23 +1,34 @@
 import prisma from "../database/model.module";
 import { Post } from "@prisma/client";
-import paginate from "../utils/paginate";
 //import { idText } from "typescript";
 export default class SocialService {
-  async _getAllPost(
-    filter: Post,
-    id: number,
-    options: any = {},
-    ignorePagination = false
-  ): Promise<Post[]> {
-    const data = ignorePagination
-      ? await prisma.post.findMany({ where: { id } })
-      : await paginate<typeof prisma.post>(filter, options, prisma.post);
+  async getAllPost(user_id: number): Promise<Post[]> {
+    const data = await prisma.post.findMany({ where: { user_id } });
+
     return data;
   }
   async createPost(createBody: Post): Promise<{ post: Post }> {
     const post: Post = await prisma.post.create({
       data: { ...createBody },
     });
+    return { post };
+  }
+  async updateUserPostById(
+    id: string,
+    updateBody: Post
+  ): Promise<{ post: Post }> {
+    const post = await prisma.post.update({
+      where: { id },
+      data: { ...updateBody },
+    });
+    return { post };
+  }
+
+  async deleteUserPostById(id: string): Promise<{ post: Post }> {
+    const post = await prisma.post.delete({
+      where: { id },
+    });
+
     return { post };
   }
 }

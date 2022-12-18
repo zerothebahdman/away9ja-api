@@ -18,7 +18,7 @@ route.post(
   }
 );
 
-route.post(
+route.get(
   "/get-all-post",
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {

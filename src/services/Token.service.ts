@@ -6,24 +6,24 @@ import { readFile } from 'fs/promises';
 import { createHash } from 'node:crypto';
 import HelperClass from '../utils/helper';
 
-let PRIVATE_KEY: string = '';
+let PRIVATE_KEY = '';
 (async () => {
   try {
     PRIVATE_KEY = await readFile(
       join(__dirname, '../certs/private_key.pem'),
-      'utf8'
+      'utf8',
     );
   } catch (err: any) {
     log.error(err.message);
   }
 })();
 
-let PUBLIC_KEY: string = '';
+let PUBLIC_KEY = '';
 (async () => {
   try {
     PUBLIC_KEY = await readFile(
       join(__dirname, '../certs/public_key.pem'),
-      'utf8'
+      'utf8',
     );
   } catch (err: any) {
     log.error(err.message);
@@ -37,7 +37,7 @@ export default class TokenService {
    */
   private async _generateAccessToken(
     id: string | number,
-    name: string
+    name: string,
   ): Promise<string> {
     const token = jwt.sign({ sub: id, name, type: 'access' }, PRIVATE_KEY, {
       algorithm: 'RS512',
@@ -49,7 +49,7 @@ export default class TokenService {
 
   private async _generateRefreshToken(
     id: string | number,
-    name: string
+    name: string,
   ): Promise<string> {
     const token = jwt.sign({ sub: id, name, type: 'refresh' }, PRIVATE_KEY, {
       algorithm: 'RS512',
@@ -61,7 +61,7 @@ export default class TokenService {
 
   async generateToken(
     id: string | number,
-    name: string
+    name: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     const accessToken = await this._generateAccessToken(id, name);
     const refreshToken = await this._generateRefreshToken(id, name);

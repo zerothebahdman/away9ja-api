@@ -1,9 +1,9 @@
-import { NextFunction, Response } from "express";
-import { RequestType } from "../middlewares/auth.middleware";
-import AppException from "../../exceptions/AppException";
-import SocialService from "../../services/Social.service";
-import httpStatus from "http-status";
-import pick from "../../utils/pick";
+import { NextFunction, Response } from 'express';
+import { RequestType } from '../middlewares/auth.middleware';
+import AppException from '../../exceptions/AppException';
+import SocialService from '../../services/Social.service';
+import httpStatus from 'http-status';
+import pick from '../../utils/pick';
 
 export default class SocialController {
   constructor(private readonly socialService: SocialService) {}
@@ -17,7 +17,7 @@ export default class SocialController {
       const feed = { user_id: req.user.id, ...req.body };
       const { post } = await this.socialService.createPost(feed);
       return res.status(httpStatus.ACCEPTED).json({
-        status: "success",
+        status: 'success',
         message: `Your feeds has been Updated`,
         post,
       });
@@ -34,13 +34,11 @@ export default class SocialController {
     next: NextFunction
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
-      //const user_id = req.user.id;
-      const filter = pick(req.query, ["sortBy", "user"]);
-      //console.log(filter);
-      const posts = await this.socialService.getAllPost(filter);
+      const filter = pick(req.query, ['sortBy', 'user']);
+      const options = pick(req.query, ['limit', 'page', 'populate']);
+      const posts = await this.socialService.getAllPost(filter, options);
       return res.status(httpStatus.ACCEPTED).json({
-        status: "success",
-        message: `These are all your feeds`,
+        status: 'success',
         posts,
       });
     } catch (err: any) {
@@ -67,7 +65,7 @@ export default class SocialController {
         feed
       );
       return res.status(httpStatus.ACCEPTED).json({
-        status: "success",
+        status: 'success',
         message: `Your feeds has been Updated`,
         post,
       });
@@ -87,7 +85,7 @@ export default class SocialController {
       const post_id = req.query.id.toString();
       const { post } = await this.socialService.deleteUserPostById(post_id);
       return res.status(httpStatus.ACCEPTED).json({
-        status: "success",
+        status: 'success',
         message: `This feed has been deleted`,
         post,
       });

@@ -1,3 +1,4 @@
+// import prisma from '../database/model.module';
 async function paginate<T>(
   filter: any,
   options: { orderBy: any; page: string; limit: string; populate: string },
@@ -47,7 +48,7 @@ async function paginate<T>(
   const skip = (page - 1) * limit;
 
   // @ts-ignore
-  const countPages = await model.count({ where: { filter } });
+  const countPages = await model.count({ where: { ...filter } });
 
   const populate: Object[] = [];
   if (options.populate) {
@@ -61,12 +62,13 @@ async function paginate<T>(
       acc = { ...acc, ...cur };
       return acc;
     }, {});
+    console.log(include);
   }
 
   //   @ts-ignore
-  let docsPromise = model({
-    where: { filter },
-    include: include ? include : {},
+  let docsPromise = await model.findMany({
+    where: { ...filter },
+    include: include ? { ...include } : undefined,
     orderBy,
     skip,
     take: limit,

@@ -1,15 +1,14 @@
-import prisma from "../database/model.module";
-import { Post } from "@prisma/client";
-import paginate from "../utils/paginate";
+import prisma from '../database/model.module';
+import { Post } from '@prisma/client';
+import paginate from '../utils/paginate';
 export default class SocialService {
   async getAllPost(
-    //@tsignore
-    //_user_id: string = "",
-    filter: any,
+    filter: Object | any,
     options: any = {},
     ignorePagination = false
   ): Promise<Post[]> {
     filter.deletedAt = null;
+
     const data = ignorePagination
       ? await prisma.post.findMany({ where: { user_id: filter.user } })
       : await paginate<typeof prisma.post>(filter, options, prisma.post);

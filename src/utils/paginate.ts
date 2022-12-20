@@ -1,4 +1,3 @@
-// import prisma from '../database/model.module';
 async function paginate<T>(
   filter: any,
   options: { orderBy: any; page: string; limit: string; populate: string },
@@ -62,7 +61,6 @@ async function paginate<T>(
       acc = { ...acc, ...cur };
       return acc;
     }, {});
-    console.log(include);
   }
 
   //   @ts-ignore

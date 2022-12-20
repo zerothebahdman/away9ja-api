@@ -35,7 +35,7 @@ export default class SocialController {
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
       const filter = pick(req.query, ['sortBy', 'user']);
-      const options = pick(req.query, ['limit', 'page', 'populate']);
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const posts = await this.socialService.getAllPost(filter, options);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

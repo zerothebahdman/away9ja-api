@@ -1,12 +1,12 @@
-import EncryptionService from './Encryption.service';
-import TokenService from './Token.service';
-import prisma from '../database/model.module';
-import { User } from '@prisma/client';
-import HelperClass from '../utils/helper';
-import { createHash } from 'node:crypto';
-import moment from 'moment';
-import UserService from './User.service';
-import EmailService from './Email.service';
+import EncryptionService from "./Encryption.service";
+import TokenService from "./Token.service";
+import prisma from "../database/model.module";
+import { User } from "@prisma/client";
+import HelperClass from "../utils/helper";
+import { createHash } from "node:crypto";
+import moment from "moment";
+import UserService from "./User.service";
+import EmailService from "./Email.service";
 
 export default class AuthService {
   constructor(
@@ -22,14 +22,14 @@ export default class AuthService {
     createBody.password = await this.encryptionService.hashPassword(
       createBody.password
     );
-    const OTP_CODE = HelperClass.generateRandomChar(6, 'num');
-    const hashedToken = createHash('sha512')
+    const OTP_CODE = HelperClass.generateRandomChar(6, "num");
+    const hashedToken = createHash("sha512")
       .update(String(OTP_CODE))
-      .digest('hex');
+      .digest("hex");
 
     createBody.emailVerificationToken = hashedToken;
     createBody.emailVerificationTokenExpiry = moment()
-      .add('6', 'hours')
+      .add("6", "hours")
       .utc()
       .toDate();
 
@@ -62,12 +62,12 @@ export default class AuthService {
   }
 
   async resendOtp(actor: User): Promise<void> {
-    const otp = HelperClass.generateRandomChar(6, 'num');
+    const otp = HelperClass.generateRandomChar(6, "num");
     const hashedToken = await this.encryptionService.hashString(otp);
 
     const updateBody: any = {
       emailVerificationToken: hashedToken,
-      emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),
+      emailVerificationTokenExpiry: moment().add("6", "hours").utc().toDate(),
     };
     await this.userService.updateUserById(actor.id, updateBody);
 

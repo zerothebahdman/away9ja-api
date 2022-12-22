@@ -5,9 +5,9 @@ export default class SocialService {
   async getAllPost(
     filter: Object | any,
     options: any = {},
-    ignorePagination = false
+    ignorePagination = false,
   ): Promise<Post[]> {
-    filter.deletedAt = null;
+    filter.deleted_at = null;
 
     const data = ignorePagination
       ? await prisma.post.findMany({ where: { user_id: filter.user } })
@@ -22,7 +22,7 @@ export default class SocialService {
   }
   async updateUserPostById(
     id: string,
-    updateBody: Post
+    updateBody: Post,
   ): Promise<{ post: Post }> {
     const post = await prisma.post.update({
       where: { id },

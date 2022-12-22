@@ -1,35 +1,35 @@
-import EncryptionService from "./Encryption.service";
-import TokenService from "./Token.service";
-import prisma from "../database/model.module";
-import { User } from "@prisma/client";
-import HelperClass from "../utils/helper";
-import { createHash } from "node:crypto";
-import moment from "moment";
-import UserService from "./User.service";
-import EmailService from "./Email.service";
+import EncryptionService from './Encryption.service';
+import TokenService from './Token.service';
+import prisma from '../database/model.module';
+import { User } from '@prisma/client';
+import HelperClass from '../utils/helper';
+import { createHash } from 'node:crypto';
+import moment from 'moment';
+import UserService from './User.service';
+import EmailService from './Email.service';
 
 export default class AuthService {
   constructor(
     private readonly encryptionService: EncryptionService,
     private readonly tokenService: TokenService,
     private readonly userService: UserService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   async createUser(
-    createBody: User
+    createBody: User,
   ): Promise<{ user: User; OTP_CODE: string }> {
     createBody.password = await this.encryptionService.hashPassword(
-      createBody.password
+      createBody.password,
     );
-    const OTP_CODE = HelperClass.generateRandomChar(6, "num");
-    const hashedToken = createHash("sha512")
+    const OTP_CODE = HelperClass.generateRandomChar(6, 'num');
+    const hashedToken = createHash('sha512')
       .update(String(OTP_CODE))
-      .digest("hex");
+      .digest('hex');
 
-    createBody.emailVerificationToken = hashedToken;
-    createBody.emailVerificationTokenExpiry = moment()
-      .add("6", "hours")
+    createBody.email_verification_token = hashedToken;
+    createBody.email_verification_tokenExpiry = moment()
+      .add('6', 'hours')
       .utc()
       .toDate();
 
@@ -40,7 +40,7 @@ export default class AuthService {
   async loginUser(loginPayload: User) {
     const token = await this.tokenService.generateToken(
       loginPayload.id,
-      loginPayload.fullName
+      loginPayload.fullName,
     );
 
     return token;
@@ -55,26 +55,26 @@ export default class AuthService {
 
     const { accessToken } = await this.tokenService.generateToken(
       user.id,
-      user.email
+      user.email,
     );
 
     return accessToken;
   }
 
   async resendOtp(actor: User): Promise<void> {
-    const otp = HelperClass.generateRandomChar(6, "num");
+    const otp = HelperClass.generateRandomChar(6, 'num');
     const hashedToken = await this.encryptionService.hashString(otp);
 
     const updateBody: any = {
-      emailVerificationToken: hashedToken,
-      emailVerificationTokenExpiry: moment().add("6", "hours").utc().toDate(),
+      email_verification_token: hashedToken,
+      email_verification_tokenExpiry: moment().add('6', 'hours').utc().toDate(),
     };
     await this.userService.updateUserById(actor.id, updateBody);
 
     await this.emailService._sendUserEmailVerificationEmail(
       actor.fullName,
       actor.email,
-      otp
+      otp,
     );
   }
 }

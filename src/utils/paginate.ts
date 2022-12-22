@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-types */
 async function paginate<T>(
   filter: any,
   options: { orderBy: any; page: string; limit: string; populate: string },
-  model: T
+  model: T,
 ) {
   /**
    * 1. check if orderBy is provided in the options,m if it exists, then use it to sort the data in whatever order is provided else use the default order
@@ -19,21 +22,21 @@ async function paginate<T>(
     const sortingCriteria: any[] = [];
     options.orderBy
       .split(',')
-      .forEach((sortOption: { split: (arg0: string) => [any, any] }) => {
+      .forEach((sortOption: { split: (arg0: string) => [never, never] }) => {
         const [key, value] = sortOption.split(':');
         const obj = { key, value };
         sortingCriteria.push(obj);
       });
     // for each of the objects inside the array, make the first value the key and the second value the value
     orderBy = sortingCriteria.reduce(
-      (acc: any, cur: { key: any; value: any }): any => {
+      (acc: any, cur: { key: any; value: unknown }): unknown => {
         acc[cur.key] = `${cur.value}`;
         return acc;
       },
-      {}
+      {},
     );
   } else {
-    orderBy = [{ createdAt: 'desc' }];
+    orderBy = [{ created_at: 'desc' }];
   }
 
   const limit =
@@ -64,7 +67,7 @@ async function paginate<T>(
   }
 
   //   @ts-ignore
-  let docsPromise = await model.findMany({
+  const docsPromise = await model.findMany({
     where: { ...filter },
     include: include ? { ...include } : undefined,
     orderBy,

@@ -14,15 +14,15 @@ CREATE TABLE "Users" (
     "stateOfOrigin" VARCHAR(255) NOT NULL,
     "referalCode" VARCHAR(255),
     "inviteCode" VARCHAR(255),
-    "isEmailVerified" BOOLEAN DEFAULT false,
-    "emailVerifiedAt" TIMESTAMP(3),
-    "emailVerificationToken" VARCHAR(255),
-    "emailVerificationTokenExpiry" TIMESTAMP(3),
-    "passwordResetToken" VARCHAR(255),
-    "passwordResetTokenExpiresAt" TIMESTAMP(3),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
+    "is_email_verified" BOOLEAN DEFAULT false,
+    "email_verified_at" TIMESTAMP(3),
+    "email_verification_token" VARCHAR(255),
+    "email_verification_tokenExpiry" TIMESTAMP(3),
+    "password_reset_token" VARCHAR(255),
+    "password_reset_token_expires_at" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
 );
@@ -40,4 +40,4 @@ CREATE UNIQUE INDEX "Users_referalCode_key" ON "Users"("referalCode");
 CREATE UNIQUE INDEX "Users_inviteCode_key" ON "Users"("inviteCode");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Users_passwordResetToken_key" ON "Users"("passwordResetToken");
+CREATE UNIQUE INDEX "Users_password_reset_token_key" ON "Users"("password_reset_token");

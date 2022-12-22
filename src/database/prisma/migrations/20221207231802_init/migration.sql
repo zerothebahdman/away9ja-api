@@ -6,9 +6,9 @@ CREATE TABLE "Posts" (
     "images" TEXT[],
     "tags" TEXT[],
     "location" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Posts_pkey" PRIMARY KEY ("id")
 );
@@ -19,9 +19,9 @@ CREATE TABLE "Post_Comments" (
     "body" VARCHAR(255) NOT NULL,
     "user_id" UUID,
     "post_id" UUID,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "Post_Comments_pkey" PRIMARY KEY ("id")
 );
@@ -31,9 +31,9 @@ CREATE TABLE "post_likes" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "user_id" UUID,
     "post_id" UUID,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "post_likes_pkey" PRIMARY KEY ("id")
 );
@@ -43,9 +43,9 @@ CREATE TABLE "parent_child_comments" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
     "parent_post_comment_id" UUID,
     "child_post_comment_id" UUID,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updateAt" TIMESTAMP(3),
-    "deletedAt" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "update_at" TIMESTAMP(3),
+    "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "parent_child_comments_pkey" PRIMARY KEY ("id")
 );

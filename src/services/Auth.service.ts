@@ -28,7 +28,7 @@ export default class AuthService {
       .digest('hex');
 
     createBody.email_verification_token = hashedToken;
-    createBody.email_verification_tokenExpiry = moment()
+    createBody.email_verification_token_expiry = moment()
       .add('6', 'hours')
       .utc()
       .toDate();

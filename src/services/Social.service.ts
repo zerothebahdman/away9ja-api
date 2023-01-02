@@ -1,16 +1,32 @@
 import prisma from '../database/model.module';
-import { Post } from '@prisma/client';
+import { Post, ParentChildComment, PostComment } from '@prisma/client';
 import paginate from '../utils/paginate';
 export default class SocialService {
   async getAllPost(
-    filter: Object | any,
-    options: any = {},
+    filter: typeof Object | unknown | any,
+    options: {
+      orderBy?: any;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
     ignorePagination = false,
-  ): Promise<Post[]> {
-    filter.deleted_at = null;
+  ): Promise<
+    | Post[]
+    | {
+        results: Post[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: any;
+      }
+  > {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
 
     const data = ignorePagination
-      ? await prisma.post.findMany({ where: { user_id: filter.user } })
+      ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
       : await paginate<typeof prisma.post>(filter, options, prisma.post);
     return data;
   }
@@ -37,5 +53,28 @@ export default class SocialService {
     });
 
     return { post };
+  }
+
+  async createComment(createBody: Post): Promise<PostComment> {
+    const comment: PostComment = await prisma.postComment.create({
+      data: { ...createBody },
+    });
+    return comment;
+  }
+
+  async createSubComment(
+    createBody: ParentChildComment,
+  ): Promise<ParentChildComment> {
+    const comment: ParentChildComment = await prisma.parentChildComment.create({
+      data: { ...createBody },
+    });
+    return comment;
+  }
+
+  async getPostComments(postId: string) {
+    const data = await prisma.postComment.findMany({
+      where: { post_id: postId },
+    });
+    return data;
   }
 }

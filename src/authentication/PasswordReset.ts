@@ -57,7 +57,9 @@ export default class PasswordReset {
 
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const hashedToken = this.encryptionService.hashString(req.body.token);
+      const hashedToken = await this.encryptionService.hashString(
+        req.body.token,
+      );
 
       const user: User = await prisma.user.findFirst({
         where: { password_reset_token: hashedToken },

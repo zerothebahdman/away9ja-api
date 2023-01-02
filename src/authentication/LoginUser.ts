@@ -5,6 +5,7 @@ import AuthService from '../services/Auth.service';
 import { User } from '@prisma/client';
 import UserService from '../services/User.service';
 import EncryptionService from '../services/Encryption.service';
+import HelperClass from '../utils/helper';
 
 export default class LoginUser {
   constructor(
@@ -35,8 +36,17 @@ export default class LoginUser {
           ),
         );
       const token = await this.authService.loginUser(_userExists);
+
       return res.status(httpStatus.ACCEPTED).json({
-        user: _userExists,
+        user: HelperClass.removeUnwantedProperties(_userExists, [
+          'email_verified_at',
+          'email_verification_token',
+          'email_verification_token_expiry',
+          'password',
+          'password_reset_token',
+          'password_reset_token_expiry',
+          'password_reset_token_expires_at',
+        ]),
         token,
       });
     } catch (err: any) {

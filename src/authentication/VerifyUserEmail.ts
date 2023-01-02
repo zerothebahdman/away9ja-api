@@ -43,7 +43,7 @@ export default class VerifyUserEmail {
         is_email_verified: true,
         email_verified_at: moment().utc().toDate(),
         email_verification_token: null,
-        email_verification_tokenExpiry: null,
+        email_verification_token_expiry: null,
       };
       await this.userService.updateUserById(user.id, data);
 

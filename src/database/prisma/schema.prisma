@@ -21,6 +21,7 @@ model User {
   password                        String        @db.VarChar(255)
   phoneNumber                     String        @db.VarChar(255)
   gender                          Gender
+  businessName                    String?       @db.VarChar(255)
   address                         String        @db.VarChar(255)
   stateOfOrigin                   String        @db.VarChar(255)
   referalCode                     String?       @unique @db.VarChar(255)

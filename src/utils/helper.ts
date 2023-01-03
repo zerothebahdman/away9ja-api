@@ -48,8 +48,18 @@ export default class HelperClass {
     const strongRegex = new RegExp(/^[ A-Za-z0-9_-]*$/);
     if (!strongRegex.test(string)) {
       throw new Error(
-        'Invalid character in username. Only hiphen (-) and underscore (_) are allowed'
+        'Invalid character in username. Only hiphen (-) and underscore (_) are allowed',
       );
     }
+  }
+  static removeUnwantedProperties(object: unknown, properties: string[]) {
+    let newObject: { [key: string]: string } = {};
+    if (typeof object === 'object' && object !== null) {
+      newObject = { ...object };
+      properties.forEach((property) => {
+        delete newObject[property];
+      });
+    }
+    return newObject;
   }
 }

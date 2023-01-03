@@ -13,71 +13,72 @@ datasource db {
 
 model User {
   // id                           Int       @id @default(autoincrement())
-  id                              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  fullName                        String         @db.VarChar(255)
-  username                        String         @unique @db.VarChar(255)
-  email                           String         @unique @db.VarChar(255)
-  password                        String         @db.VarChar(255)
-  phoneNumber                     String         @db.VarChar(255)
-  gender                          Gender         @default(male)
-  address                         String         @db.VarChar(255)
-  stateOfOrigin                   String         @db.VarChar(255)
-  referalCode                     String?        @unique @db.VarChar(255)
-  inviteCode                      String?        @unique @db.VarChar(255)
-  is_email_verified               Boolean?       @default(false)
+  fullName                        String        @db.VarChar(255)
+  username                        String        @unique @db.VarChar(255)
+  email                           String        @unique @db.VarChar(255)
+  password                        String        @db.VarChar(255)
+  phoneNumber                     String        @db.VarChar(255)
+  gender                          Gender
+  businessName                    String?       @db.VarChar(255)
+  address                         String        @db.VarChar(255)
+  stateOfOrigin                   String        @db.VarChar(255)
+  referalCode                     String?       @unique @db.VarChar(255)
+  inviteCode                      String?       @unique @db.VarChar(255)
+  is_email_verified               Boolean?      @default(false)
   email_verified_at               DateTime?
-  email_verification_token        String?        @db.VarChar(255)
+  email_verification_token        String?       @db.VarChar(255)
   email_verification_token_expiry DateTime?
-  password_reset_token            String?        @unique @db.VarChar(255)
+  password_reset_token            String?       @unique @db.VarChar(255)
   password_reset_token_expires_at DateTime?
-  created_at                      DateTime       @default(now())
-  update_at                       DateTime?      @updatedAt
+  created_at                      DateTime      @default(now())
+  update_at                       DateTime?     @updatedAt
   deleted_at                      DateTime?
   posts                           Post[]
-  post_comment                    Post_Comment[]
-  post_likes                      post_likes[]
+  post_comment                    PostComment[]
+  post_likes                      PostLikes[]
 
   @@map("Users")
 }
 
 model Post {
-  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body         String?        @db.VarChar(255)
-  User         User?          @relation(fields: [user_id], references: [id])
-  user_id      String?        @db.Uuid
-  post_type    String         @db.VarChar(255)
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body         String?       @db.VarChar(255)
+  user         User?         @relation(fields: [user_id], references: [id])
+  user_id      String?       @db.Uuid
+  post_type    PostType?
   images       String[]
   tags         String[]
   location     String?
-  created_at   DateTime       @default(now())
-  update_at    DateTime?      @updatedAt
+  created_at   DateTime      @default(now())
+  update_at    DateTime?     @updatedAt
   deleted_at   DateTime?
-  Post_Comment Post_Comment[]
-  post_likes   post_likes[]
+  post_comment PostComment[]
+  post_likes   PostLikes[]
 
   @@map("Posts")
 }
 
-model Post_Comment {
-  id                  String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body                String                 @db.VarChar(255)
-  User                User?                  @relation(fields: [user_id], references: [id])
-  user_id             String?                @db.Uuid
-  Post                Post?                  @relation(fields: [post_id], references: [id])
-  post_id             String?                @db.Uuid
-  created_at          DateTime               @default(now())
-  update_at           DateTime?              @updatedAt
+model PostComment {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body                String               @db.VarChar(255)
+  user                User?                @relation(fields: [user_id], references: [id])
+  user_id             String?              @db.Uuid
+  Post                Post?                @relation(fields: [post_id], references: [id])
+  post_id             String?              @db.Uuid
+  created_at          DateTime             @default(now())
+  update_at           DateTime?            @updatedAt
   deleted_at          DateTime?
-  parent_post_comment parent_child_comment[] @relation("parent_post_comment")
-  child_post_comment  parent_child_comment[] @relation("child_post_comment")
+  parent_post_comment ParentChildComment[] @relation("parent_post_comment")
+  child_post_comment  ParentChildComment[] @relation("child_post_comment")
 
   @@map("Post_Comments")
 }
 
-model post_likes {
+model PostLikes {
   id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  User       User?     @relation(fields: [user_id], references: [id])
+  user       User?     @relation(fields: [user_id], references: [id])
   user_id    String?   @db.Uuid
   Post       Post?     @relation(fields: [post_id], references: [id])
   post_id    String?   @db.Uuid
@@ -88,14 +89,14 @@ model post_likes {
   @@map("post_likes")
 }
 
-model parent_child_comment {
-  id                     String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  parent_post_comment    Post_Comment? @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment")
-  parent_post_comment_id String?       @db.Uuid
-  child_post_comment     Post_Comment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment")
-  child_post_comment_id  String?       @db.Uuid
-  created_at             DateTime      @default(now())
-  update_at              DateTime?     @updatedAt
+model ParentChildComment {
+  id                     String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_post_comment    PostComment? @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment")
+  parent_post_comment_id String?      @db.Uuid
+  child_post_comment     PostComment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment")
+  child_post_comment_id  String?      @db.Uuid
+  created_at             DateTime     @default(now())
+  update_at              DateTime?    @updatedAt
   deleted_at             DateTime?
 
   @@map("parent_child_comments")
@@ -104,4 +105,10 @@ model parent_child_comment {
 enum Gender {
   male
   female
+}
+
+enum PostType {
+  post_image
+  post_text
+  post_text_image
 }

@@ -6,8 +6,17 @@ export default class UserService {
   async getAllUsers(
     filter: User,
     options: any = {},
-    ignorePagination = false
-  ): Promise<User[]> {
+    ignorePagination = false,
+  ): Promise<
+    | User[]
+    | {
+        results: any;
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: any;
+      }
+  > {
     const data = ignorePagination
       ? await prisma.user.findMany()
       : await paginate<typeof prisma.user>(filter, options, prisma.user);
@@ -15,8 +24,8 @@ export default class UserService {
   }
 
   async getUserById(
-    id: number,
-    eagerLoad?: { include: { [key: string]: boolean } }
+    id: string,
+    eagerLoad?: { include: { [key: string]: boolean } },
   ): Promise<User> {
     const data = eagerLoad
       ? await prisma.user.findUnique({ where: { id } })
@@ -30,7 +39,7 @@ export default class UserService {
     return data;
   }
 
-  async deleteUserById(id: number): Promise<User> {
+  async deleteUserById(id: string): Promise<User> {
     const data = await prisma.user.delete({ where: { id } });
     return data;
   }

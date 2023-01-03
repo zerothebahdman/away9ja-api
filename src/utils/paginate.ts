@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 async function paginate<T>(
   filter: any,
-  options: { orderBy: any; page: string; limit: string; populate: string },
+  options: { orderBy?: any; page?: string; limit?: string; populate?: string },
   model: T,
 ) {
   /**

@@ -67,7 +67,10 @@ export default class AuthService {
 
     const updateBody: any = {
       email_verification_token: hashedToken,
-      email_verification_tokenExpiry: moment().add('6', 'hours').utc().toDate(),
+      email_verification_token_expiry: moment()
+        .add('6', 'hours')
+        .utc()
+        .toDate(),
     };
     await this.userService.updateUserById(actor.id, updateBody);
 

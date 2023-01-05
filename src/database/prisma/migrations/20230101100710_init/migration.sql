@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Posts" ALTER COLUMN "body" DROP NOT NULL;

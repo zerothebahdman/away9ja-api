@@ -38,6 +38,7 @@ model User {
   posts                           Post[]
   post_comment                    PostComment[]
   post_likes                      PostLikes[]
+  marketPlace                     marketPlace[]
 
   @@map("Users")
 }
@@ -67,6 +68,7 @@ model PostComment {
   user_id             String?              @db.Uuid
   Post                Post?                @relation(fields: [post_id], references: [id])
   post_id             String?              @db.Uuid
+  type                CommentType?
   created_at          DateTime             @default(now())
   update_at           DateTime?            @updatedAt
   deleted_at          DateTime?
@@ -96,10 +98,53 @@ model ParentChildComment {
   child_post_comment     PostComment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment")
   child_post_comment_id  String?      @db.Uuid
   created_at             DateTime     @default(now())
-  update_at              DateTime?    @updatedAt
+  updated_at             DateTime?    @updatedAt
   deleted_at             DateTime?
 
   @@map("parent_child_comments")
+}
+
+model Categories {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @db.VarChar(255)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime?     @updatedAt
+  deleted_at  DateTime?
+  marketPlace marketPlace[]
+
+  @@map("categories")
+}
+
+model marketPlace {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String      @db.VarChar(255)
+  location    String?     @db.VarChar(255)
+  user        User?       @relation(fields: [user_id], references: [id])
+  user_id     String?     @db.Uuid
+  category    Categories? @relation(fields: [category_id], references: [id])
+  category_id String?     @db.Uuid
+  description String?     @db.VarChar(255)
+  photos      String[]
+  created_at  DateTime    @default(now())
+  updated_at  DateTime?   @updatedAt
+  deleted_at  DateTime?
+
+  @@map("marketPlace")
+}
+
+model Event {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String    @db.VarChar(255)
+  location    String?   @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  photo       String?   @db.VarChar(255)
+  date        DateTime  @db.Date
+  time        DateTime  @db.Time()
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
+
+  @@map("events")
 }
 
 enum Gender {
@@ -108,7 +153,12 @@ enum Gender {
 }
 
 enum PostType {
-  post_image
-  post_text
-  post_text_image
+  image
+  text
+  text_image
+}
+
+enum CommentType {
+  mainComment
+  subComment
 }

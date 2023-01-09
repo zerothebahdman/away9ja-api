@@ -13,22 +13,22 @@ export default class AuthService {
     private readonly encryptionService: EncryptionService,
     private readonly tokenService: TokenService,
     private readonly userService: UserService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   async createUser(
-    createBody: User
+    createBody: User,
   ): Promise<{ user: User; OTP_CODE: string }> {
     createBody.password = await this.encryptionService.hashPassword(
-      createBody.password
+      createBody.password,
     );
     const OTP_CODE = HelperClass.generateRandomChar(6, 'num');
     const hashedToken = createHash('sha512')
       .update(String(OTP_CODE))
       .digest('hex');
 
-    createBody.emailVerificationToken = hashedToken;
-    createBody.emailVerificationTokenExpiry = moment()
+    createBody.email_verification_token = hashedToken;
+    createBody.email_verification_token_expiry = moment()
       .add('6', 'hours')
       .utc()
       .toDate();
@@ -40,7 +40,7 @@ export default class AuthService {
   async loginUser(loginPayload: User) {
     const token = await this.tokenService.generateToken(
       loginPayload.id,
-      loginPayload.fullName
+      loginPayload.fullName,
     );
 
     return token;
@@ -55,7 +55,7 @@ export default class AuthService {
 
     const { accessToken } = await this.tokenService.generateToken(
       user.id,
-      user.email
+      user.email,
     );
 
     return accessToken;
@@ -66,15 +66,18 @@ export default class AuthService {
     const hashedToken = await this.encryptionService.hashString(otp);
 
     const updateBody: any = {
-      emailVerificationToken: hashedToken,
-      emailVerificationTokenExpiry: moment().add('6', 'hours').utc().toDate(),
+      email_verification_token: hashedToken,
+      email_verification_token_expiry: moment()
+        .add('6', 'hours')
+        .utc()
+        .toDate(),
     };
     await this.userService.updateUserById(actor.id, updateBody);
 
     await this.emailService._sendUserEmailVerificationEmail(
       actor.fullName,
       actor.email,
-      otp
+      otp,
     );
   }
 }

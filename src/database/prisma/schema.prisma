@@ -13,32 +13,160 @@ datasource db {
 
 model User {
   // id                           Int       @id @default(autoincrement())
-  id                           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  fullName                     String    @db.VarChar(255)
-  username                     String    @unique @db.VarChar(255)
-  email                        String    @unique @db.VarChar(255)
-  password                     String    @db.VarChar(255)
-  phoneNumber                  String    @db.VarChar(255)
-  gender                       Gender    @default(male)
-  address                      String    @db.VarChar(255)
-  stateOfOrigin                String    @db.VarChar(255)
-  referalCode                  String?   @unique @db.VarChar(255)
-  inviteCode                   String?   @unique @db.VarChar(255)
-  isEmailVerified              Boolean?  @default(false)
-  emailVerifiedAt              DateTime?
-  emailVerificationToken       String?   @db.VarChar(255)
-  emailVerificationTokenExpiry DateTime?
-  passwordResetToken           String?   @unique @db.VarChar(255)
-  passwordResetTokenExpiresAt  DateTime?
-  createdAt                    DateTime  @default(now())
-  updateAt                     DateTime? @updatedAt
-  deletedAt                    DateTime?
+  fullName                        String         @db.VarChar(255)
+  username                        String         @unique @db.VarChar(255)
+  email                           String         @unique @db.VarChar(255)
+  password                        String         @db.VarChar(255)
+  phoneNumber                     String         @db.VarChar(255)
+  gender                          Gender
+  maritalStatus                   MaritalStatus?
+  businessName                    String?        @db.VarChar(255)
+  address                         String         @db.VarChar(255)
+  stateOfOrigin                   String         @db.VarChar(255)
+  referalCode                     String?        @unique @db.VarChar(255)
+  inviteCode                      String?        @unique @db.VarChar(255)
+  is_email_verified               Boolean?       @default(false)
+  email_verified_at               DateTime?
+  email_verification_token        String?        @db.VarChar(255)
+  email_verification_token_expiry DateTime?
+  password_reset_token            String?        @unique @db.VarChar(255)
+  password_reset_token_expires_at DateTime?
+  created_at                      DateTime       @default(now())
+  update_at                       DateTime?      @updatedAt
+  deleted_at                      DateTime?
+  posts                           Post[]
+  post_comment                    PostComment[]
+  post_likes                      PostLikes[]
+  marketPlace                     marketPlace[]
 
   @@map("Users")
+}
+
+model Post {
+  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body         String?       @db.VarChar(255)
+  user         User?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id      String?       @db.Uuid
+  post_type    PostType?
+  images       String[]
+  tags         String[]
+  location     String?
+  created_at   DateTime      @default(now())
+  update_at    DateTime?     @updatedAt
+  deleted_at   DateTime?
+  post_comment PostComment[]
+  post_likes   PostLikes[]
+
+  @@map("Posts")
+}
+
+model PostComment {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body                String               @db.VarChar(255)
+  user                User?                @relation(fields: [user_id], references: [id])
+  user_id             String?              @db.Uuid
+  Post                Post?                @relation(fields: [post_id], references: [id])
+  post_id             String?              @db.Uuid
+  type                CommentType?
+  created_at          DateTime             @default(now())
+  update_at           DateTime?            @updatedAt
+  deleted_at          DateTime?
+  parent_post_comment ParentChildComment[] @relation("parent_post_comment")
+  child_post_comment  ParentChildComment[] @relation("child_post_comment")
+
+  @@map("Post_Comments")
+}
+
+model PostLikes {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user       User?     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id    String?   @db.Uuid
+  Post       Post?     @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  post_id    String?   @db.Uuid
+  created_at DateTime  @default(now())
+  update_at  DateTime? @updatedAt
+  deleted_at DateTime?
+
+  @@map("post_likes")
+}
+
+model ParentChildComment {
+  id                     String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_post_comment    PostComment? @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment", onDelete: Cascade, onUpdate: Cascade)
+  parent_post_comment_id String?      @db.Uuid
+  child_post_comment     PostComment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment", onDelete: Cascade, onUpdate: Cascade)
+  child_post_comment_id  String?      @db.Uuid
+  created_at             DateTime     @default(now())
+  updated_at             DateTime?    @updatedAt
+  deleted_at             DateTime?
+
+  @@map("parent_child_comments")
+}
+
+model Categories {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String        @db.VarChar(255)
+  created_at  DateTime      @default(now())
+  updated_at  DateTime?     @updatedAt
+  deleted_at  DateTime?
+  marketPlace marketPlace[]
+
+  @@map("categories")
+}
+
+model marketPlace {
+  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String      @db.VarChar(255)
+  location    String?     @db.VarChar(255)
+  user        User?       @relation(fields: [user_id], references: [id])
+  user_id     String?     @db.Uuid
+  category    Categories? @relation(fields: [category_id], references: [id])
+  category_id String?     @db.Uuid
+  description String?     @db.VarChar(255)
+  photos      String[]
+  created_at  DateTime    @default(now())
+  updated_at  DateTime?   @updatedAt
+  deleted_at  DateTime?
+
+  @@map("marketPlace")
+}
+
+model Event {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String    @db.VarChar(255)
+  location    String?   @db.VarChar(255)
+  description String?   @db.VarChar(255)
+  photo       String?   @db.VarChar(255)
+  date        DateTime  @db.Date
+  time        DateTime  @db.Time()
+  created_at  DateTime  @default(now())
+  updated_at  DateTime? @updatedAt
+  deleted_at  DateTime?
+
+  @@map("events")
 }
 
 enum Gender {
   male
   female
+}
+
+enum PostType {
+  image
+  text
+  text_image
+}
+
+enum CommentType {
+  mainComment
+  subComment
+}
+
+enum MaritalStatus {
+  single
+  married
+  divorced
+  widowed
 }

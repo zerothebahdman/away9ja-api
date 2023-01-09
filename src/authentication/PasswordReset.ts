@@ -14,28 +14,31 @@ export default class PasswordReset {
   constructor(
     private readonly emailService: EmailService,
     private readonly encryptionService: EncryptionService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
   ) {}
 
   async sendResetPasswordEmail(
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ) {
     try {
       const { email } = req.body;
       const userExists: User = await this.userService.getUserByEmail(email);
       if (!userExists)
         return next(
-          new AppException('Oops! User does not exist', httpStatus.NOT_FOUND)
+          new AppException('Oops! User does not exist', httpStatus.NOT_FOUND),
         );
 
       const token = HelperClass.generateRandomChar(6, 'num');
       const hashedToken = await this.encryptionService.hashPassword(token);
 
       const updateBody: any = {
-        passwordResetToken: hashedToken,
-        passwordResetTokenExpiresAt: moment().add(12, 'hours').utc().toDate(),
+        password_reset_token: hashedToken,
+        password_reset_token_expires_at: moment()
+          .add(12, 'hours')
+          .utc()
+          .toDate(),
       };
 
       await this.userService.updateUserById(userExists.id, updateBody);
@@ -43,7 +46,7 @@ export default class PasswordReset {
       await this.emailService._sendUserPasswordResetInstructionEmail(
         userExists.fullName,
         userExists.email,
-        token
+        token,
       );
 
       res.status(httpStatus.NO_CONTENT).send();
@@ -54,23 +57,25 @@ export default class PasswordReset {
 
   async resetPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const hashedToken = this.encryptionService.hashString(req.body.token);
+      const hashedToken = await this.encryptionService.hashString(
+        req.body.token,
+      );
 
       const user: User = await prisma.user.findFirst({
-        where: { passwordResetToken: hashedToken },
+        where: { password_reset_token: hashedToken },
       });
 
       if (!user) return TokenMustStillBeValid(next);
-      if (user.passwordResetTokenExpiresAt < moment().utc().toDate())
+      if (user.password_reset_token_expires_at < moment().utc().toDate())
         throw new Error(`Oops!, your token has expired`);
       const hashedPassword = await this.encryptionService.hashPassword(
-        req.body.password
+        req.body.password,
       );
 
       const updateBody: any = {
         password: hashedPassword,
-        passwordResetToken: null,
-        passwordResetTokenExpiresAt: null,
+        password_reset_token: null,
+        password_reset_token_expires_at: null,
       };
 
       await this.userService.updateUserById(user.id, updateBody);

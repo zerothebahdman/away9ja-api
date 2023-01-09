@@ -82,7 +82,7 @@ CREATE TABLE "parent_child_comments" (
     "parent_post_comment_id" UUID,
     "child_post_comment_id" UUID,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3),
+    "update_at" TIMESTAMP(3),
     "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "parent_child_comments_pkey" PRIMARY KEY ("id")
@@ -104,7 +104,7 @@ CREATE UNIQUE INDEX "Users_inviteCode_key" ON "Users"("inviteCode");
 CREATE UNIQUE INDEX "Users_password_reset_token_key" ON "Users"("password_reset_token");
 
 -- AddForeignKey
-ALTER TABLE "Posts" ADD CONSTRAINT "Posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Posts" ADD CONSTRAINT "Posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Post_Comments" ADD CONSTRAINT "Post_Comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -113,13 +113,13 @@ ALTER TABLE "Post_Comments" ADD CONSTRAINT "Post_Comments_user_id_fkey" FOREIGN 
 ALTER TABLE "Post_Comments" ADD CONSTRAINT "Post_Comments_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "Posts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "post_likes" ADD CONSTRAINT "post_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "post_likes" ADD CONSTRAINT "post_likes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "post_likes" ADD CONSTRAINT "post_likes_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "Posts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "post_likes" ADD CONSTRAINT "post_likes_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "Posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "parent_child_comments" ADD CONSTRAINT "parent_child_comments_parent_post_comment_id_fkey" FOREIGN KEY ("parent_post_comment_id") REFERENCES "Post_Comments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "parent_child_comments" ADD CONSTRAINT "parent_child_comments_parent_post_comment_id_fkey" FOREIGN KEY ("parent_post_comment_id") REFERENCES "Post_Comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "parent_child_comments" ADD CONSTRAINT "parent_child_comments_child_post_comment_id_fkey" FOREIGN KEY ("child_post_comment_id") REFERENCES "Post_Comments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "parent_child_comments" ADD CONSTRAINT "parent_child_comments_child_post_comment_id_fkey" FOREIGN KEY ("child_post_comment_id") REFERENCES "Post_Comments"("id") ON DELETE CASCADE ON UPDATE CASCADE;

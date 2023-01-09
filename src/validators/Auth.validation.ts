@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { MaritalStatus } from '../../config/constants';
 
 export const LoginValidator = {
   body: Joi.object().keys({
@@ -25,6 +26,9 @@ export const CreateUserValidator = {
     fullName: Joi.string().min(3).lowercase().max(40).required(),
     username: Joi.string().min(3).lowercase().max(40).required(),
     businessName: Joi.string().min(3).lowercase().max(40).required(),
+    maritalStatus: Joi.string()
+      .valid(...Object.values(MaritalStatus))
+      .required(),
     email: Joi.string().email().lowercase().required().messages({
       'string.email': 'Oops!, you need to provide valid email address',
       'string.required': 'Oops!, you have to specify an email address',

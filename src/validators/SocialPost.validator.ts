@@ -20,8 +20,8 @@ export const CreateCommentValidator = {
       'string.max': 'You have exceeded more than 150 characters',
     }),
     post_id: Joi.custom(objectId),
-    type: Joi.string().valid('main_comment', 'sub_comment'),
-    parent_comment_id: Joi.when('type', {
+    type: Joi.string().valid('mainComment', 'subComment'),
+    parent_post_comment_id: Joi.when('type', {
       is: 'subComment',
       then: Joi.custom(objectId).required(),
     }),

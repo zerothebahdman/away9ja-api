@@ -59,4 +59,12 @@ route.get(
   },
 );
 
+route.get(
+  '/comment/sub/:comment_id',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    socialController.getSubComment(req, res, next);
+  },
+);
+
 export default route;

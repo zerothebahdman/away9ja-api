@@ -28,7 +28,7 @@ const envVarsSchema = Joi.object()
     CLOUDINARY_API_KEY: Joi.string().label('Cloudinary API Key'),
     CLOUDINARY_API_SECRET: Joi.string().label('Cloudinary API Secret'),
     CRON_SCHEDULE_DELETE_USER_ACCOUNT_IF_NOT_VERIFIED: Joi.string().label(
-      'Cron Schedule Delete User Account If Not Verified'
+      'Cron Schedule Delete User Account If Not Verified',
     ),
   })
   .unknown();
@@ -45,6 +45,7 @@ export default {
   FRONTEND_APP_URL: envVars.FRONTEND_APP_URL,
   DATABASE_URL: envVars.DATABASE_URL,
   port: envVars.PORT,
+  appName: envVars.APP_NAME,
   jwtAccessTokenExpiration: envVars.JWT_ACCESS_TOKEN_EXPIRES,
   jwtRefreshTokenExpiration: envVars.JWT_REFRESH_TOKEN_EXPIRES,
   name: envVars.APP_NAME,

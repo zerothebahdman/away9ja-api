@@ -40,6 +40,7 @@ model User {
   post_comment                    PostComment[]
   post_likes                      PostLikes[]
   marketPlace                     marketPlace[]
+  Event                           Event[]
 
   @@map("Users")
 }
@@ -138,9 +139,11 @@ model Event {
   title       String    @db.VarChar(255)
   location    String?   @db.VarChar(255)
   description String?   @db.VarChar(255)
+  user_id     String?   @db.Uuid
+  user        User?     @relation(fields: [user_id], references: [id])
   photo       String?   @db.VarChar(255)
-  date        DateTime  @db.Date
-  time        DateTime  @db.Time()
+  date        String?   @db.VarChar(255)
+  time        String    @db.VarChar(255)
   created_at  DateTime  @default(now())
   updated_at  DateTime? @updatedAt
   deleted_at  DateTime?

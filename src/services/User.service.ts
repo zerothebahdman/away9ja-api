@@ -4,17 +4,17 @@ import paginate from '../utils/paginate';
 
 export default class UserService {
   async getAllUsers(
-    filter: User,
+    filter: Partial<typeof prisma.user>,
     options: any = {},
     ignorePagination = false,
   ): Promise<
     | User[]
     | {
-        results: any;
+        results: typeof Object;
         page: number;
         limit: number;
         totalPages: number;
-        total: any;
+        total: number;
       }
   > {
     const data = ignorePagination
@@ -34,7 +34,7 @@ export default class UserService {
     return data;
   }
 
-  async updateUserById(id: string, updateBody: User): Promise<User> {
+  async updateUserById(id: string, updateBody: Partial<User>): Promise<User> {
     const data = await prisma.user.update({ where: { id }, data: updateBody });
     return data;
   }

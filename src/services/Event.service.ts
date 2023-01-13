@@ -4,7 +4,7 @@ import paginate from '../utils/paginate';
 
 export default class EventService {
   async getEvents(
-    filter: Partial<Event>,
+    filter: Partial<typeof prisma.event>,
     options: {
       orderBy?: string;
       page?: string;
@@ -15,7 +15,7 @@ export default class EventService {
   ): Promise<
     | Event[]
     | {
-        results: typeof Object;
+        results: object;
         page: number;
         limit: number;
         totalPages: number;

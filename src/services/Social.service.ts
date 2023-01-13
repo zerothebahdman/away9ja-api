@@ -5,7 +5,7 @@ import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
 export default class SocialService {
   async getAllPost(
-    filter: typeof Object | unknown | any,
+    filter: object | unknown | any,
     options: {
       orderBy?: any;
       page?: string;

@@ -11,7 +11,7 @@ export default class MarketController {
   async addMarketItem(req: RequestType, res: Response, next: NextFunction) {
     try {
       const marketItem = { user_id: req.user.id, ...req.body };
-      const { Item } = await this.marketService.addMarketItem(marketItem);
+      const Item = await this.marketService.addMarketItem(marketItem);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: 'Your Listings has been updated with this item',
@@ -42,21 +42,21 @@ export default class MarketController {
 
   async editMarketItem(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const marketItem_id = req.query.id.toString();
+      const marketItemId = req.query.id.toString();
 
       const marketItem = {
         user_id: req.user.id,
         ...req.body,
       };
 
-      const { Item } = await this.marketService.updateMarketItemByItem_Id(
-        marketItem_id,
+      const marketPlaceItem = await this.marketService.updateMarketItemByItemId(
+        marketItemId,
         marketItem,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `This Item has been Updated in your Listings`,
-        Item,
+        marketPlaceItem,
       });
     } catch (err: any) {
       return next(
@@ -71,15 +71,9 @@ export default class MarketController {
     next: NextFunction,
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
-      const marketItem_id = req.query.id.toString();
-      const { Item } = await this.marketService.deleteMarketItemByItem_Id(
-        marketItem_id,
-      );
-      return res.status(httpStatus.ACCEPTED).json({
-        status: 'success',
-        message: `This Item has been deleted`,
-        Item,
-      });
+      const marketItemId = req.query.id.toString();
+      await this.marketService.deleteMarketItemByItemId(marketItemId);
+      return res.status(httpStatus.NO_CONTENT).send();
     } catch (err: any) {
       return next(
         new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
@@ -106,7 +100,7 @@ export default class MarketController {
   async addCategory(req: RequestType, res: Response, next: NextFunction) {
     try {
       //const categoryBody = { user_id: req.user.id, ...req.body };
-      const { category } = await this.marketService.addCategory({
+      const category = await this.marketService.addCategory({
         ...req.body,
       });
       return res.status(httpStatus.ACCEPTED).json({

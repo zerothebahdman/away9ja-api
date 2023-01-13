@@ -1,11 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
-//import { addItemValidator } from '../../../validators/marketPlace.validator';
 import { marketController } from '../../controllers/controllers.module';
 import { isUserAuthenticated } from '../../middlewares/auth.middleware';
 import validate from '../../middlewares/validate';
 import {
   addItemValidator,
   addCategoryValidator,
+  editItemValidator,
 } from '../../../validators/marketPlace.validator';
 
 const route = Router();
@@ -27,9 +27,10 @@ route.get(
   },
 );
 
-route.post(
+route.put(
   '/edit-item',
   isUserAuthenticated,
+  validate(editItemValidator),
   (req: Request, res: Response, next: NextFunction) => {
     marketController.editMarketItem(req, res, next);
   },

@@ -3,12 +3,12 @@ import { marketPlace, Categories } from '@prisma/client';
 import paginate from '../utils/paginate';
 
 export default class MarketService {
-  async addMarketItem(createBody: marketPlace): Promise<{ Item: marketPlace }> {
-    const Item: marketPlace = await prisma.marketPlace.create({
+  async addMarketItem(createBody: marketPlace) {
+    const marketPlaceItem = await prisma.marketPlace.create({
       data: { ...createBody },
     });
 
-    return { Item };
+    return marketPlaceItem;
   }
 
   async getAllMyItem(
@@ -46,23 +46,18 @@ export default class MarketService {
     return data;
   }
 
-  async updateMarketItemByItem_Id(
-    id: string,
-    updateBody: marketPlace,
-  ): Promise<{ Item: marketPlace }> {
-    const Item = await prisma.marketPlace.update({
+  async updateMarketItemByItemId(id: string, updateBody: marketPlace) {
+    const marketPlaceItem = await prisma.marketPlace.update({
       where: { id },
       data: { ...updateBody },
     });
-    return { Item };
+    return marketPlaceItem;
   }
 
-  async deleteMarketItemByItem_Id(id: string): Promise<{ Item: marketPlace }> {
-    const Item = await prisma.marketPlace.delete({
+  async deleteMarketItemByItemId(id: string) {
+    await prisma.marketPlace.delete({
       where: { id },
     });
-
-    return { Item };
   }
 
   async listings(
@@ -98,12 +93,12 @@ export default class MarketService {
     return data;
   }
 
-  async addCategory(createBody: Categories): Promise<{ category: Categories }> {
-    const category: Categories = await prisma.categories.create({
+  async addCategory(createBody: Categories) {
+    const category = await prisma.categories.create({
       data: { ...createBody },
     });
 
-    return { category };
+    return category;
   }
 
   async getAllCategory(

@@ -31,7 +31,7 @@ export default class PasswordReset {
         );
 
       const token = HelperClass.generateRandomChar(6, 'num');
-      const hashedToken = await this.encryptionService.hashPassword(token);
+      const hashedToken = await this.encryptionService.hashString(token);
 
       const updateBody: any = {
         password_reset_token: hashedToken,
@@ -60,6 +60,7 @@ export default class PasswordReset {
       const hashedToken = await this.encryptionService.hashString(
         req.body.token,
       );
+      console.log(hashedToken);
 
       const user: User = await prisma.user.findFirst({
         where: { password_reset_token: hashedToken },

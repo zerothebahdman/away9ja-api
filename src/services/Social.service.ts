@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from '../database/model.module';
 import { Post, ParentChildComment, PostComment } from '@prisma/client';
 import paginate from '../utils/paginate';
+import { CommentType } from '../../config/constants';
 export default class SocialService {
   async getAllPost(
-    filter: typeof Object | unknown | any,
+    filter: object | unknown | any,
     options: {
       orderBy?: any;
       page?: string;
@@ -62,18 +64,40 @@ export default class SocialService {
     return comment;
   }
 
-  async createSubComment(
-    createBody: ParentChildComment,
-  ): Promise<ParentChildComment> {
+  async createSubComment(createBody: any): Promise<ParentChildComment> {
     const comment: ParentChildComment = await prisma.parentChildComment.create({
       data: { ...createBody },
     });
     return comment;
   }
 
-  async getPostComments(postId: string) {
+  async getPostComments(
+    filter: { type?: CommentType; post_id: string } | qs.ParsedQs,
+  ) {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
     const data = await prisma.postComment.findMany({
-      where: { post_id: postId },
+      where: {
+        ...filter,
+      },
+    });
+    return data;
+  }
+
+  async getSubComments(filter: any) {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
+    const data = await prisma.parentChildComment.findMany({
+      where: { ...filter },
+    });
+    return data;
+  }
+
+  async getCommentById(id: string) {
+    const data = await prisma.postComment.findUnique({
+      where: { id },
     });
     return data;
   }

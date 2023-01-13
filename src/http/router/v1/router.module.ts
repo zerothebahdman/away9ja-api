@@ -2,6 +2,7 @@ import { Router } from 'express';
 import authRoute from './auth.route';
 import socialRoute from './social.route';
 import marketRoute from './market.route';
+import eventRoute from './event.route';
 
 const router = Router();
 
@@ -9,6 +10,7 @@ const defaultRoutes = [
   { path: '/auth', route: authRoute },
   { path: '/social', route: socialRoute },
   { path: '/market', route: marketRoute },
+  { path: '/event', route: eventRoute },
 ];
 
 defaultRoutes.forEach(({ path, route }) => {

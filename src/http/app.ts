@@ -16,7 +16,7 @@ import config from '../../config/default';
 
 const app: Application = express();
 
-if (config.env === 'production') {
+if (config.env === 'production' || config.env === 'staging') {
   app.use(enforce.HTTPS({ trustProtoHeader: true }));
 }
 
@@ -40,7 +40,7 @@ app.use('/api', limiter);
 app.disable('x-powered-by');
 
 app.get('/', (_req, res) => {
-  res.send('<b>Welcome to Away 9ja App!</b>');
+  res.send(`<b>Welcome to ${config.appName} App!</b>`);
 });
 
 app.use('/api/v1', router);
@@ -49,8 +49,8 @@ app.all('*', (req: Request, _res: Response, next: NextFunction) => {
   return next(
     new AppException(
       `Cant find ${req.originalUrl} on the server.`,
-      httpStatus.NOT_FOUND
-    )
+      httpStatus.NOT_FOUND,
+    ),
   );
 });
 

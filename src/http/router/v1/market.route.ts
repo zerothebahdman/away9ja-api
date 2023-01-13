@@ -27,7 +27,7 @@ route.get(
   },
 );
 
-route.put(
+route.patch(
   '/edit-item',
   isUserAuthenticated,
   validate(editItemValidator),

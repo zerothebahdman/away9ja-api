@@ -3,7 +3,7 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodeJs: 19
+      nodejs: 19
     commands:
       - yarn install -g typescript
       - yarn install

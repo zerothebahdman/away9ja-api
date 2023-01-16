@@ -5,7 +5,7 @@ phases:
     runtime-versions:
       nodejs: 16
     commands:
-      - yarn install -g typescript
+      - yarn global add typescript
       - yarn install
   build:
     commands:

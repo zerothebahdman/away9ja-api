@@ -13,34 +13,35 @@ datasource db {
 
 model User {
   // id                           Int       @id @default(autoincrement())
-  id                              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  fullName                        String         @db.VarChar(255)
-  username                        String         @unique @db.VarChar(255)
-  email                           String         @unique @db.VarChar(255)
-  password                        String         @db.VarChar(255)
-  phoneNumber                     String         @db.VarChar(255)
+  fullName                        String               @db.VarChar(255)
+  username                        String               @unique @db.VarChar(255)
+  email                           String               @unique @db.VarChar(255)
+  password                        String               @db.VarChar(255)
+  phoneNumber                     String               @db.VarChar(255)
   gender                          Gender
   maritalStatus                   MaritalStatus?
-  businessName                    String?        @db.VarChar(255)
-  address                         String         @db.VarChar(255)
-  stateOfOrigin                   String         @db.VarChar(255)
-  referalCode                     String?        @unique @db.VarChar(255)
-  inviteCode                      String?        @unique @db.VarChar(255)
-  is_email_verified               Boolean?       @default(false)
+  businessName                    String?              @db.VarChar(255)
+  address                         String               @db.VarChar(255)
+  stateOfOrigin                   String               @db.VarChar(255)
+  referalCode                     String?              @unique @db.VarChar(255)
+  inviteCode                      String?              @unique @db.VarChar(255)
+  is_email_verified               Boolean?             @default(false)
   email_verified_at               DateTime?
-  email_verification_token        String?        @db.VarChar(255)
+  email_verification_token        String?              @db.VarChar(255)
   email_verification_token_expiry DateTime?
-  password_reset_token            String?        @unique @db.VarChar(255)
+  password_reset_token            String?              @unique @db.VarChar(255)
   password_reset_token_expires_at DateTime?
-  created_at                      DateTime       @default(now())
-  update_at                       DateTime?      @updatedAt
+  created_at                      DateTime             @default(now())
+  update_at                       DateTime?            @updatedAt
   deleted_at                      DateTime?
   posts                           Post[]
   post_comment                    PostComment[]
   post_likes                      PostLikes[]
   marketPlace                     marketPlace[]
   Event                           Event[]
+  marketPlaceComment              marketPlaceComment[]
 
   @@map("Users")
 }
@@ -54,6 +55,8 @@ model Post {
   images       String[]
   tags         String[]
   location     String?
+  isApproved   Boolean?      @default(false)
+  isAnonymous  Boolean?      @default(false)
   created_at   DateTime      @default(now())
   update_at    DateTime?     @updatedAt
   deleted_at   DateTime?
@@ -66,9 +69,9 @@ model Post {
 model PostComment {
   id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   body                String               @db.VarChar(255)
-  user                User?                @relation(fields: [user_id], references: [id])
+  user                User?                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id             String?              @db.Uuid
-  Post                Post?                @relation(fields: [post_id], references: [id])
+  Post                Post?                @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   post_id             String?              @db.Uuid
   type                CommentType?
   created_at          DateTime             @default(now())
@@ -94,14 +97,18 @@ model PostLikes {
 }
 
 model ParentChildComment {
-  id                     String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  parent_post_comment    PostComment? @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment", onDelete: Cascade, onUpdate: Cascade)
-  parent_post_comment_id String?      @db.Uuid
-  child_post_comment     PostComment? @relation(fields: [child_post_comment_id], references: [id], "child_post_comment", onDelete: Cascade, onUpdate: Cascade)
-  child_post_comment_id  String?      @db.Uuid
-  created_at             DateTime     @default(now())
-  updated_at             DateTime?    @updatedAt
-  deleted_at             DateTime?
+  id                             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_post_comment            PostComment?        @relation(fields: [parent_post_comment_id], references: [id], "parent_post_comment", onDelete: Cascade, onUpdate: Cascade)
+  parent_post_comment_id         String?             @db.Uuid
+  child_post_comment             PostComment?        @relation(fields: [child_post_comment_id], references: [id], "child_post_comment", onDelete: Cascade, onUpdate: Cascade)
+  child_post_comment_id          String?             @db.Uuid
+  created_at                     DateTime            @default(now())
+  updated_at                     DateTime?           @updatedAt
+  deleted_at                     DateTime?
+  parent_market_place_comment    marketPlaceComment? @relation(fields: [parent_market_place_comment_id], "parent_market_place_comment", references: [id], onDelete: Cascade, onUpdate: Cascade)
+  parent_market_place_comment_id String?             @db.Uuid
+  child_market_place_comment     marketPlaceComment? @relation(fields: [child_market_place_comment_id], "child_market_place_comment", references: [id], onDelete: Cascade, onUpdate: Cascade)
+  child_market_place_comment_id  String?             @db.Uuid
 
   @@map("parent_child_comments")
 }
@@ -118,20 +125,39 @@ model Categories {
 }
 
 model marketPlace {
-  id          String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String      @db.VarChar(255)
-  location    String?     @db.VarChar(255)
-  user        User?       @relation(fields: [user_id], references: [id])
-  user_id     String?     @db.Uuid
-  category    Categories? @relation(fields: [category_id], references: [id])
-  category_id String?     @db.Uuid
-  description String?     @db.VarChar(255)
-  photos      String[]
-  created_at  DateTime    @default(now())
-  updated_at  DateTime?   @updatedAt
-  deleted_at  DateTime?
+  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String               @db.VarChar(255)
+  location           String?              @db.VarChar(255)
+  user               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id            String?              @db.Uuid
+  category           Categories?          @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  category_id        String?              @db.Uuid
+  description        String?              @db.VarChar(255)
+  photos             String[]
+  amount             Float                @db.DoublePrecision
+  created_at         DateTime             @default(now())
+  updated_at         DateTime?            @updatedAt
+  deleted_at         DateTime?
+  marketPlaceComment marketPlaceComment[]
 
   @@map("marketPlace")
+}
+
+model marketPlaceComment {
+  id                          String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body                        String               @db.VarChar(255)
+  user                        User?                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id                     String?              @db.Uuid
+  marketPlace                 marketPlace?         @relation(fields: [marketPlaceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketPlaceId               String?              @db.Uuid
+  type                        CommentType?
+  created_at                  DateTime             @default(now())
+  update_at                   DateTime?            @updatedAt
+  deleted_at                  DateTime?
+  parent_market_place_comment ParentChildComment[] @relation("parent_market_place_comment")
+  child_market_place_comment  ParentChildComment[] @relation("child_market_place_comment")
+
+  @@map("marketPlace_Comments")
 }
 
 model Event {
@@ -140,7 +166,7 @@ model Event {
   location    String?   @db.VarChar(255)
   description String?   @db.VarChar(255)
   user_id     String?   @db.Uuid
-  user        User?     @relation(fields: [user_id], references: [id])
+  user        User?     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   photo       String?   @db.VarChar(255)
   date        String?   @db.VarChar(255)
   time        String    @db.VarChar(255)

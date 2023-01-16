@@ -7,7 +7,7 @@ import httpStatus from 'http-status';
 import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
 import { CommentType } from '../../../config/constants';
-import { PostComment } from '@prisma/client';
+import { ParentChildComment, PostComment } from '@prisma/client';
 
 export default class SocialController {
   constructor(private readonly socialService: SocialService) {}
@@ -30,14 +30,17 @@ export default class SocialController {
 
   async createComment(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const parentComment = req.body.parent_post_comment_id;
+      const parentComment: string = req.body.parent_post_comment_id;
       delete req.body.parent_post_comment_id;
       const commentBody = { user_id: req.user.id, ...req.body };
       const comment = await this.socialService.createComment(commentBody);
       if (req.body.type === CommentType.SUB_COMMENT) {
-        const subCommentBody = {
-          parent_post_comment_id: parentComment as string,
-          child_post_comment_id: comment?.id as string,
+        const subCommentBody: Pick<
+          ParentChildComment,
+          'parent_post_comment_id' | 'child_post_comment_id'
+        > = {
+          parent_post_comment_id: parentComment,
+          child_post_comment_id: comment?.id,
         };
         await this.socialService.createSubComment(subCommentBody);
       }

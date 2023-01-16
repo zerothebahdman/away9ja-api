@@ -15,7 +15,7 @@ export default class SocialController {
   async createPost(req: RequestType, res: Response, next: NextFunction) {
     try {
       const feed = { user_id: req.user.id, ...req.body };
-      const { post } = await this.socialService.createPost(feed);
+      const post = await this.socialService.createPost(feed);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,
@@ -215,10 +215,7 @@ export default class SocialController {
         user_id: req.user.id,
         ...req.body,
       };
-      const { post } = await this.socialService.updateUserPostById(
-        post_id,
-        feed,
-      );
+      const post = await this.socialService.updateUserPostById(post_id, feed);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,
@@ -238,7 +235,7 @@ export default class SocialController {
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
       const post_id = req.query.id.toString();
-      const { post } = await this.socialService.deleteUserPostById(post_id);
+      const post = await this.socialService.deleteUserPostById(post_id);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `This feed has been deleted`,

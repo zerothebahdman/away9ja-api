@@ -5,7 +5,7 @@ import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
 export default class SocialService {
   async getAllPost(
-    filter: object | unknown | any,
+    filter: Partial<Post>,
     options: {
       orderBy?: any;
       page?: string;
@@ -29,32 +29,29 @@ export default class SocialService {
 
     const data = ignorePagination
       ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
-      : await paginate<typeof prisma.post>(filter, options, prisma.post);
+      : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
     return data;
   }
-  async createPost(createBody: Post): Promise<{ post: Post }> {
+  async createPost(createBody: Post): Promise<Post> {
     const post: Post = await prisma.post.create({
       data: { ...createBody },
     });
-    return { post };
+    return post;
   }
-  async updateUserPostById(
-    id: string,
-    updateBody: Post,
-  ): Promise<{ post: Post }> {
+  async updateUserPostById(id: string, updateBody: Post): Promise<Post> {
     const post = await prisma.post.update({
       where: { id },
       data: { ...updateBody },
     });
-    return { post };
+    return post;
   }
 
-  async deleteUserPostById(id: string): Promise<{ post: Post }> {
+  async deleteUserPostById(id: string): Promise<Post> {
     const post = await prisma.post.delete({
       where: { id },
     });
 
-    return { post };
+    return post;
   }
 
   async createComment(createBody: Post): Promise<PostComment> {

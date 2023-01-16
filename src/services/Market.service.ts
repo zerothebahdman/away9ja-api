@@ -2,7 +2,7 @@ import prisma from '../database/model.module';
 import { marketPlace, Categories } from '@prisma/client';
 import paginate from '../utils/paginate';
 
-export default class MarketService {
+export default class MarketPlaceService {
   async addMarketItem(createBody: marketPlace) {
     const marketPlaceItem = await prisma.marketPlace.create({
       data: { ...createBody },
@@ -12,9 +12,9 @@ export default class MarketService {
   }
 
   async getAllMyItem(
-    filter: typeof Object | unknown | any,
+    filter: Partial<marketPlace>,
     options: {
-      orderBy?: any;
+      orderBy?: string;
       page?: string;
       limit?: string;
       populate?: string;
@@ -27,7 +27,7 @@ export default class MarketService {
         page: number;
         limit: number;
         totalPages: number;
-        total: any;
+        total: number;
       }
   > {
     if (typeof filter === 'object' && filter !== null) {
@@ -38,7 +38,7 @@ export default class MarketService {
       ? await prisma.marketPlace.findMany({
           where: { user_id: filter.user_id },
         })
-      : await paginate<typeof prisma.marketPlace>(
+      : await paginate<marketPlace, typeof prisma.marketPlace>(
           filter,
           options,
           prisma.marketPlace,
@@ -61,9 +61,9 @@ export default class MarketService {
   }
 
   async listings(
-    filter: typeof Object | unknown | any,
+    filter: Partial<marketPlace>,
     options: {
-      orderBy?: any;
+      orderBy?: string;
       page?: string;
       limit?: string;
       populate?: string;
@@ -76,7 +76,7 @@ export default class MarketService {
         page: number;
         limit: number;
         totalPages: number;
-        total: any;
+        total: string;
       }
   > {
     if (typeof filter === 'object' && filter !== null) {
@@ -85,7 +85,7 @@ export default class MarketService {
 
     const data = ignorePagination
       ? await prisma.marketPlace.findMany()
-      : await paginate<typeof prisma.marketPlace>(
+      : await paginate<marketPlace, typeof prisma.marketPlace>(
           filter,
           options,
           prisma.marketPlace,
@@ -102,9 +102,9 @@ export default class MarketService {
   }
 
   async getAllCategory(
-    filter: typeof Object | unknown | any,
+    filter: Partial<Categories>,
     options: {
-      orderBy?: any;
+      orderBy?: string;
       page?: string;
       limit?: string;
       populate?: string;
@@ -117,7 +117,7 @@ export default class MarketService {
         page: number;
         limit: number;
         totalPages: number;
-        total: any;
+        total: number;
       }
   > {
     if (typeof filter === 'object' && filter !== null) {
@@ -126,7 +126,7 @@ export default class MarketService {
 
     const data = ignorePagination
       ? await prisma.categories.findMany()
-      : await paginate<typeof prisma.categories>(
+      : await paginate<Categories, typeof prisma.categories>(
           filter,
           options,
           prisma.categories,

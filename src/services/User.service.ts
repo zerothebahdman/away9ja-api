@@ -4,8 +4,13 @@ import paginate from '../utils/paginate';
 
 export default class UserService {
   async getAllUsers(
-    filter: Partial<typeof prisma.user>,
-    options: any = {},
+    filter: Partial<User>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
     ignorePagination = false,
   ): Promise<
     | User[]
@@ -19,7 +24,7 @@ export default class UserService {
   > {
     const data = ignorePagination
       ? await prisma.user.findMany()
-      : await paginate<typeof prisma.user>(filter, options, prisma.user);
+      : await paginate<User, typeof prisma.user>(filter, options, prisma.user);
     return data;
   }
 

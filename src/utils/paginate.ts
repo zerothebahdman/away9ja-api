@@ -2,7 +2,7 @@
 type sortingCriteria = {
   [key: string]: string;
 };
-async function paginate<T>(
+async function paginate<T, K>(
   filter: Partial<T>,
   options: {
     orderBy?: string;
@@ -10,7 +10,7 @@ async function paginate<T>(
     limit?: string;
     populate?: string;
   },
-  model: T,
+  model: K,
 ) {
   /**
    * 1. check if orderBy is provided in the options,m if it exists, then use it to sort the data in whatever order is provided else use the default order

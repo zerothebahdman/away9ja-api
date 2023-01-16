@@ -4,7 +4,7 @@ import paginate from '../utils/paginate';
 
 export default class EventService {
   async getEvents(
-    filter: Partial<typeof prisma.event>,
+    filter: Partial<Event>,
     options: {
       orderBy?: string;
       page?: string;
@@ -27,7 +27,11 @@ export default class EventService {
     }
     const data = ignorePagination
       ? await prisma.event.findMany()
-      : await paginate<typeof prisma.event>(filter, options, prisma.event);
+      : await paginate<Event, typeof prisma.event>(
+          filter,
+          options,
+          prisma.event,
+        );
     return data;
   }
 

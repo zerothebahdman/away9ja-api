@@ -15,7 +15,7 @@ artifacts:
   files:
     - yarn.lock
     - package.json
-    - node_modules
+    - 'node_modules/**/*'
     - 'build/**/*'
     - '.platform/**/*' # AWS Elastic Beanstalk configuration files
     - '.ebextensions/**/*' # AWS Elastic Beanstalk configuration files

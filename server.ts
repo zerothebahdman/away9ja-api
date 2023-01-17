@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import app from './src/http/app';
 import log from './src/logging/logger';
 import config from './config/default';

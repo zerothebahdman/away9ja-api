@@ -11,11 +11,7 @@ const emailService = new EmailService();
 export default class CreateUser {
   constructor(private readonly authService: AuthService) {}
 
-  async createUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response<any, Record<string, any>>> {
+  async createUser(req: Request, res: Response, next: NextFunction) {
     try {
       const emailTaken = await prisma.user.findUnique({
         where: { email: req.body.email },
@@ -44,7 +40,7 @@ export default class CreateUser {
       await emailService._sendUserEmailVerificationEmail(
         user.fullName,
         user.email,
-        OTP_CODE
+        OTP_CODE,
       );
 
       return res.status(httpStatus.OK).json({
@@ -54,7 +50,7 @@ export default class CreateUser {
       });
     } catch (err: any) {
       return next(
-        new AppException(err.message, err.status || httpStatus.BAD_REQUEST)
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
       );
     }
   }

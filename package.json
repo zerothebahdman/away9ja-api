@@ -14,6 +14,7 @@
     "prisma:studio": "prisma studio --schema=./src/database/prisma/schema.prisma",
     "migrate:prod": "prisma migrate deploy --schema=./database/prisma/schema.prisma",
     "generate": "prisma generate --schema=./src/database/prisma/schema.prisma",
+    "generate:build": "prisma generate --schema=./build/src/database/prisma/schema.prisma",
     "start": "npm run generate && node build/server.js"
   },
   "keywords": [],

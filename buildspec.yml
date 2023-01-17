@@ -10,12 +10,14 @@ phases:
   build:
     commands:
       - yarn build
+      - yarn generate
 
 artifacts:
   files:
     - yarn.lock
     - package.json
     - 'build/**/*'
+    - 'node_modules/**/*'
     - '.platform/**/*' # AWS Elastic Beanstalk configuration files
     - '.ebextensions/**/*' # AWS Elastic Beanstalk configuration files
   discard-paths: no

@@ -5,7 +5,7 @@ phases:
     runtime-versions:
       nodejs: latest
     commands:
-      - npm install -g yarn typescript
+      - yarn global add typescript
       - yarn install
   build:
     commands:

@@ -95,7 +95,11 @@ export default class SocialService {
   async getCommentById(id: string) {
     const data = await prisma.postComment.findUnique({
       where: { id },
+      include: {
+        user: true,
+      },
     });
+
     return data;
   }
 }

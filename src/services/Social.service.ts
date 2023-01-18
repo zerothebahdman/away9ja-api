@@ -78,6 +78,9 @@ export default class SocialService {
       where: {
         ...filter,
       },
+      include: {
+        user: true,
+      },
     });
     return data;
   }

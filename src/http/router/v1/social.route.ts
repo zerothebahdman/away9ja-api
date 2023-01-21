@@ -18,6 +18,14 @@ route.post(
   },
 );
 
+route.post(
+  '/like-post/:post_id',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    socialController.likePost(req, res, next);
+  },
+);
+
 route.get(
   '/get-all-post',
   isUserAuthenticated,

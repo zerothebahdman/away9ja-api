@@ -1,13 +1,23 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from '../database/model.module';
-import { Post, ParentChildComment, PostComment } from '@prisma/client';
+import {
+  Post,
+  ParentChildComment,
+  PostComment,
+  User,
+  PostLikes,
+} from '@prisma/client';
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
+import HelperClass from '../utils/helper';
+
+interface PostObj extends Post {
+  user: User;
+}
 export default class SocialService {
   async getAllPost(
     filter: Partial<Post>,
     options: {
-      orderBy?: any;
+      orderBy?: string;
       page?: string;
       limit?: string;
       populate?: string;
@@ -20,7 +30,7 @@ export default class SocialService {
         page: number;
         limit: number;
         totalPages: number;
-        total: any;
+        total: number;
       }
   > {
     if (typeof filter === 'object' && filter !== null) {
@@ -29,8 +39,43 @@ export default class SocialService {
 
     const data = ignorePagination
       ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
-      : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
-    return data;
+      : ((await paginate<Post, typeof prisma.post>(
+          filter,
+          options,
+          prisma.post,
+        )) as {
+          results: Post[];
+          page: number;
+          limit: number;
+          totalPages: number;
+          total: number;
+        });
+    const newData = data as {
+      likesCount: number;
+      commentsCount: number;
+      results: PostObj[];
+      page: number;
+      limit: number;
+      totalPages: number;
+      total: number;
+    };
+    newData.likesCount = await this.getPostLikesCount({ post_id: filter.id });
+    newData.commentsCount = await this.getPostCommentsCount({
+      post_id: filter.id,
+    });
+    newData.results.forEach((post: PostObj) => {
+      if (post.isAnonymous === true) {
+        post.user_id = 'anonymous';
+        delete post?.user;
+        const user = {
+          username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+          profile_image: null as null,
+          fullName: 'Anonymous',
+        };
+        Object.assign(post, { user });
+      }
+    });
+    return newData;
   }
   async createPost(createBody: Post): Promise<Post> {
     const post: Post = await prisma.post.create({
@@ -61,7 +106,9 @@ export default class SocialService {
     return comment;
   }
 
-  async createSubComment(createBody: any): Promise<ParentChildComment> {
+  async createSubComment(
+    createBody: Partial<ParentChildComment>,
+  ): Promise<ParentChildComment> {
     const comment: ParentChildComment = await prisma.parentChildComment.create({
       data: { ...createBody },
     });
@@ -85,7 +132,7 @@ export default class SocialService {
     return data;
   }
 
-  async getSubComments(filter: any) {
+  async getSubComments(filter: Partial<ParentChildComment>) {
     if (typeof filter === 'object' && filter !== null) {
       Object.assign(filter, { deleted_at: null });
     }
@@ -103,6 +150,38 @@ export default class SocialService {
       },
     });
 
+    return data;
+  }
+
+  async likePost(data: Partial<PostLikes>): Promise<{ message: string }> {
+    const { user_id, post_id } = data;
+    const like = await prisma.postLikes.findFirst({
+      where: { user_id, post_id },
+    });
+
+    if (like) {
+      await prisma.postLikes.delete({
+        where: { id: like.id },
+      });
+      return { message: 'Post unliked' };
+    }
+    await prisma.postLikes.create({
+      data: { user_id, post_id },
+    });
+    return { message: 'Post liked' };
+  }
+
+  async getPostLikesCount(filter: Partial<PostLikes>) {
+    const data = await prisma.postLikes.count({
+      where: { ...filter },
+    });
+    return data;
+  }
+
+  async getPostCommentsCount(filter: Partial<PostComment>) {
+    const data = await prisma.postComment.count({
+      where: { ...filter },
+    });
     return data;
   }
 }

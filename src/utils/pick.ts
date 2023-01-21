@@ -1,14 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ParsedQs } from 'qs';
 /**
  * Create an object composed of the picked object properties
  * @param {Object} object
  * @param {string[]} keys
  * @returns {Object}
  */
-const pick = (object: any, keys: string[]): object => {
-  return keys.reduce((obj: any, key: any) => {
+type ObjT = {
+  [key: string]: string;
+};
+
+const pick = (object: ObjT | ParsedQs, keys: string[]): object => {
+  return keys.reduce((obj: ObjT, key: keyof ObjT) => {
     if (object && Object.prototype.hasOwnProperty.call(object, key)) {
-      obj[key] = object[key];
+      obj[key] = object[key] as string;
     }
     return obj;
   }, {});

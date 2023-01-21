@@ -20,4 +20,5 @@ artifacts:
     - 'node_modules/**/*'
     - '.platform/**/*' # AWS Elastic Beanstalk configuration files
     - '.ebextensions/**/*' # AWS Elastic Beanstalk configuration files
+  name: deploy-nodejs-build-artifacts
   discard-paths: no

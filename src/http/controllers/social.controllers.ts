@@ -14,12 +14,30 @@ export default class SocialController {
 
   async createPost(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const feed = { user_id: req.user.id, ...req.body };
-      const post = await this.socialService.createPost(feed);
+      req.body.user_id = req.user.id;
+      req.body.isApproved = false;
+      const post = await this.socialService.createPost(req.body);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,
         post,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async likePost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const { message } = await this.socialService.likePost({
+        user_id: req.user.id,
+        post_id: req.params.post_id,
+      });
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message,
       });
     } catch (err: any) {
       return next(
@@ -197,6 +215,7 @@ export default class SocialController {
   async getAllPost(req: RequestType, res: Response, next: NextFunction) {
     try {
       const filter = pick(req.query, ['user_id']);
+      Object.assign(filter, { isApproved: true });
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const posts = await this.socialService.getAllPost(filter, options);
       return res.status(httpStatus.ACCEPTED).json({

@@ -11,6 +11,7 @@ export const CreatePostValidator = {
     location: Joi.string().min(3).lowercase().max(20),
     images: Joi.array().items(Joi.string()).optional(),
     tags: Joi.array().items(Joi.string()).optional(),
+    isAnonymous: Joi.boolean().optional(),
   }),
 };
 

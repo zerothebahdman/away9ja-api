@@ -1,5 +1,11 @@
 import prisma from '../database/model.module';
-import { Post, ParentChildComment, PostComment, User } from '@prisma/client';
+import {
+  Post,
+  ParentChildComment,
+  PostComment,
+  User,
+  PostLikes,
+} from '@prisma/client';
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
 import HelperClass from '../utils/helper';
@@ -45,12 +51,14 @@ export default class SocialService {
           total: number;
         });
     const newData = data as {
+      likesCount: number;
       results: PostObj[];
       page: number;
       limit: number;
       totalPages: number;
       total: number;
     };
+    newData.likesCount = await this.getPostLikesCount({ post_id: filter.id });
     newData.results.forEach((post: PostObj) => {
       if (post.isAnonymous === true) {
         post.user_id = 'anonymous';
@@ -138,6 +146,31 @@ export default class SocialService {
       },
     });
 
+    return data;
+  }
+
+  async likePost(data: Partial<PostLikes>): Promise<{ message: string }> {
+    const { user_id, post_id } = data;
+    const like = await prisma.postLikes.findFirst({
+      where: { user_id, post_id },
+    });
+
+    if (like) {
+      await prisma.postLikes.delete({
+        where: { id: like.id },
+      });
+      return { message: 'Post unliked' };
+    }
+    await prisma.postLikes.create({
+      data: { user_id, post_id },
+    });
+    return { message: 'Post liked' };
+  }
+
+  async getPostLikesCount(filter: Partial<PostLikes>) {
+    const data = await prisma.postLikes.count({
+      where: { ...filter },
+    });
     return data;
   }
 }

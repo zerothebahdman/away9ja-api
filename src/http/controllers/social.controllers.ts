@@ -29,6 +29,23 @@ export default class SocialController {
     }
   }
 
+  async likePost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const { message } = await this.socialService.likePost({
+        user_id: req.user.id,
+        post_id: req.params.post_id,
+      });
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
   async createComment(req: RequestType, res: Response, next: NextFunction) {
     try {
       const parentComment: string = req.body.parent_post_comment_id;

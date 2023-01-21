@@ -6,6 +6,7 @@ import {
   addItemValidator,
   addCategoryValidator,
   editItemValidator,
+  createMarketPlaceCommentValidator,
 } from '../../../validators/marketPlace.validator';
 
 const route = Router();
@@ -68,4 +69,28 @@ route.get(
   },
 );
 
+route.post(
+  '/create-marketPlaceComment',
+  isUserAuthenticated,
+  validate(createMarketPlaceCommentValidator),
+  (req: Request, res: Response, next: NextFunction) => {
+    marketController.createMarketPlaceComment(req, res, next);
+  },
+);
+
+route.get(
+  '/marketPlaceComment/maincomment/:marketItemId',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    marketController.getMarketPlaceComment(req, res, next);
+  },
+);
+
+route.get(
+  '/marketPlaceComment/subcomment/:marketPlace_Comment_Id',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    marketController.getMarketPlaceSubComment(req, res, next);
+  },
+);
 export default route;

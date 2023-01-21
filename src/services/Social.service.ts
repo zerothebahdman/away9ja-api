@@ -52,6 +52,7 @@ export default class SocialService {
         });
     const newData = data as {
       likesCount: number;
+      commentsCount: number;
       results: PostObj[];
       page: number;
       limit: number;
@@ -59,6 +60,9 @@ export default class SocialService {
       total: number;
     };
     newData.likesCount = await this.getPostLikesCount({ post_id: filter.id });
+    newData.commentsCount = await this.getPostCommentsCount({
+      post_id: filter.id,
+    });
     newData.results.forEach((post: PostObj) => {
       if (post.isAnonymous === true) {
         post.user_id = 'anonymous';
@@ -169,6 +173,13 @@ export default class SocialService {
 
   async getPostLikesCount(filter: Partial<PostLikes>) {
     const data = await prisma.postLikes.count({
+      where: { ...filter },
+    });
+    return data;
+  }
+
+  async getPostCommentsCount(filter: Partial<PostComment>) {
+    const data = await prisma.postComment.count({
       where: { ...filter },
     });
     return data;

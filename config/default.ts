@@ -8,7 +8,7 @@ const envVarsSchema = Joi.object()
       .required()
       .valid('development', 'production', 'test', 'staging'),
     PORT: Joi.number(),
-    FRONTEND_APP_URL: Joi.string().required().label('Frontend APP URL'),
+    FRONTEND_APP_URL: Joi.string().label('Frontend APP URL'),
     DATABASE_URL: Joi.string().required().label('Database URL'),
     APP_NAME: Joi.string().required().label('App Name').default('AGSAAP'),
     JWT_ACCESS_TOKEN_EXPIRES: Joi.string()

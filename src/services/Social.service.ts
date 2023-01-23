@@ -184,4 +184,41 @@ export default class SocialService {
     });
     return data;
   }
+
+  async getAnonymousPost(
+    filter: Partial<Post>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
+    ignorePagination = false,
+  ): Promise<
+    | Post[]
+    | {
+        results: Post[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      }
+  > {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
+    const data = ignorePagination
+      ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
+      : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
+
+    return data;
+  }
+
+  async approveAnonymousPost(id: string): Promise<Post> {
+    const post = await prisma.post.update({
+      where: { id },
+      data: { isApproved: true },
+    });
+    return post;
+  }
 }

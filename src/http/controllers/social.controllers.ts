@@ -269,4 +269,41 @@ export default class SocialController {
       );
     }
   }
+
+  async getAnonymousPost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const filter = pick(req.query, ['user_id']);
+      Object.assign(filter, { isAnonymous: true, isApproved: false });
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
+      const posts = await this.socialService.getAnonymousPost(filter, options);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        posts,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async approveAnonymousPost(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const post_id = req.params.postId.toString();
+      const post = await this.socialService.approveAnonymousPost(post_id);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: `The post has been approved`,
+        post,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

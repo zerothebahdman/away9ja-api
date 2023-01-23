@@ -6,6 +6,8 @@ import {
   CreatePostValidator,
   CreateCommentValidator,
 } from '../../../validators/SocialPost.validator';
+import { restrictAccessTo } from '../../middlewares/role.middleware';
+import { ROLE } from '../../../../config/constants';
 
 const route = Router();
 
@@ -74,5 +76,24 @@ route.get(
     socialController.getSubComment(req, res, next);
   },
 );
+
+route
+  .route('/pending-anonymous-post')
+  .get(
+    isUserAuthenticated,
+    restrictAccessTo(ROLE.ADMIN),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.getAnonymousPost(req, res, next);
+    },
+  );
+route
+  .route('/approve-anonymous-post/:postId')
+  .patch(
+    isUserAuthenticated,
+    restrictAccessTo(ROLE.ADMIN),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.approveAnonymousPost(req, res, next);
+    },
+  );
 
 export default route;

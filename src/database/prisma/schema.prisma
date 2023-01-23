@@ -22,6 +22,7 @@ model User {
   password                        String               @db.VarChar(255)
   phoneNumber                     String               @db.VarChar(255)
   gender                          Gender
+  role                            Role?                @default(user)
   maritalStatus                   MaritalStatus?
   businessName                    String?              @db.VarChar(255)
   address                         String               @db.VarChar(255)
@@ -205,4 +206,9 @@ enum MaritalStatus {
 enum AccountStatus {
   pending
   verified
+}
+
+enum Role {
+  admin
+  user
 }

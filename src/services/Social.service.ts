@@ -211,7 +211,29 @@ export default class SocialService {
       ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
       : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
 
-    return data;
+    const newData = data as {
+      likesCount: number;
+      commentsCount: number;
+      results: PostObj[];
+      page: number;
+      limit: number;
+      totalPages: number;
+      total: number;
+    };
+    newData.results.forEach((post: PostObj) => {
+      if (post.isAnonymous === true) {
+        post.user_id = 'anonymous';
+        delete post?.user;
+        const user = {
+          username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+          profile_image: null as null,
+          fullName: 'Anonymous',
+        };
+        Object.assign(post, { user });
+      }
+    });
+
+    return newData;
   }
 
   async approveAnonymousPost(id: string): Promise<Post> {

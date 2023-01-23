@@ -60,7 +60,7 @@ export const CreateUserValidator = {
     gender: Joi.string().required().valid('male', 'female'),
     address: Joi.string().required().lowercase(),
     stateOfOrigin: Joi.string().required().lowercase(),
-    inviteCode: Joi.string().required().lowercase(),
+    inviteCode: Joi.string().required(),
   }),
 };
 

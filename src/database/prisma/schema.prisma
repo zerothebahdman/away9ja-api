@@ -22,12 +22,14 @@ model User {
   password                        String               @db.VarChar(255)
   phoneNumber                     String               @db.VarChar(255)
   gender                          Gender
+  role                            Role?                @default(user)
   maritalStatus                   MaritalStatus?
   businessName                    String?              @db.VarChar(255)
   address                         String               @db.VarChar(255)
   stateOfOrigin                   String               @db.VarChar(255)
-  referalCode                     String?              @unique @db.VarChar(255)
-  inviteCode                      String?              @unique @db.VarChar(255)
+  referralCode                    String?              @unique @db.VarChar(255)
+  inviteCode                      String?              @db.VarChar(255)
+  status                          AccountStatus?       @default(pending)
   is_email_verified               Boolean?             @default(false)
   email_verified_at               DateTime?
   email_verification_token        String?              @db.VarChar(255)
@@ -199,4 +201,14 @@ enum MaritalStatus {
   married
   divorced
   widowed
+}
+
+enum AccountStatus {
+  pending
+  verified
+}
+
+enum Role {
+  admin
+  user
 }

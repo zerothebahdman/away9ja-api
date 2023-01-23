@@ -1,5 +1,6 @@
 import Joi from 'joi';
-import { MaritalStatus } from '../../config/constants';
+import { MaritalStatus, AccountStatus } from '../../config/constants';
+import { objectId } from './Custom.validator';
 
 export const LoginValidator = {
   body: Joi.object().keys({
@@ -59,7 +60,7 @@ export const CreateUserValidator = {
     gender: Joi.string().required().valid('male', 'female'),
     address: Joi.string().required().lowercase(),
     stateOfOrigin: Joi.string().required().lowercase(),
-    inviteCode: Joi.string().optional().lowercase(),
+    inviteCode: Joi.string().required().lowercase(),
   }),
 };
 
@@ -112,5 +113,14 @@ export const resendOtpValidator = {
     email: Joi.string().email().lowercase().required().messages({
       'any.required': 'Oops!, you have to specify an email address',
     }),
+  }),
+};
+
+export const referredUserValidator = {
+  body: Joi.object().keys({
+    user: Joi.custom(objectId).required(),
+    status: Joi.string()
+      .valid(...Object.values(AccountStatus))
+      .required(),
   }),
 };

@@ -53,4 +53,27 @@ export default class UserService {
     const data = await prisma.user.findUnique({ where: { email } });
     return data;
   }
+
+  async getReferredUsers(
+    filter: Partial<User>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
+    ignorePagination = false,
+  ): Promise<
+    | User[]
+    | {
+        results: typeof Object;
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      }
+  > {
+    const data = ignorePagination ? await prisma.user.findMany() : await paginate<User, typeof prisma.user>(filter, options, prisma.user);
+    return data;
+  }
 }

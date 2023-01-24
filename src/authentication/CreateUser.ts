@@ -37,15 +37,17 @@ export default class CreateUser {
 
       req.body.status = AccountStatus.PENDING;
 
-      /** Save the referral and referrer details */
-      const referrer = await prisma.user.findUnique({
-        where: { referralCode: req.body.inviteCode },
-      });
+      if (req.body.role !== 'admin') {
+        /** Save the referral and referrer details */
+        const referrer = await prisma.user.findUnique({
+          where: { referralCode: req.body.inviteCode },
+        });
 
-      if (!referrer) {
-        return next(
-          new AppException('Invalid referral code', httpStatus.BAD_REQUEST),
-        );
+        if (!referrer) {
+          return next(
+            new AppException('Invalid referral code', httpStatus.BAD_REQUEST),
+          );
+        }
       }
 
       /** if user does not exist create the user using the user service */

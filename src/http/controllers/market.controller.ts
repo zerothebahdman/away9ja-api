@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Response } from 'express';
 import { RequestType } from '../middlewares/auth.middleware';
 import AppException from '../../exceptions/AppException';
@@ -105,7 +106,7 @@ export default class MarketController {
       });
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
-        message: 'Categories has been updated with this category',
+        message: 'MarketPlaceCategories has been updated with this category',
         category,
       });
     } catch (err: any) {
@@ -119,13 +120,13 @@ export default class MarketController {
     try {
       const filter = pick(req.query, ['user_id']);
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
-      const allCategory = await this.marketService.getAllCategory(
+      const marketPlaceCategories = await this.marketService.getAllCategory(
         filter,
         options,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
-        allCategory,
+        marketPlaceCategories,
       });
     } catch (err: any) {
       return next(

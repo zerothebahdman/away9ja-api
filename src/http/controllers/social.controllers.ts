@@ -306,4 +306,58 @@ export default class SocialController {
       );
     }
   }
+
+  async deleteAnonymousPost(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const post_id = req.params.postId.toString();
+      await this.socialService.deleteAnonymousPost(post_id);
+      return res.status(httpStatus.NO_CONTENT);
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async addPostCategory(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const category = await this.socialService.addPostCategory(req.body);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: 'Post Category has been updated with this category',
+        category,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async getAllPostCategory(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const filter = pick(req.query, ['user_id']);
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
+      const postCategories = await this.socialService.getAllPostCategory(
+        filter,
+        options,
+      );
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        postCategories,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

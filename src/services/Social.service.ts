@@ -5,6 +5,7 @@ import {
   PostComment,
   User,
   PostLikes,
+  PostCategories,
 } from '@prisma/client';
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
@@ -242,5 +243,52 @@ export default class SocialService {
       data: { isApproved: true },
     });
     return post;
+  }
+
+  async deleteAnonymousPost(id: string): Promise<void> {
+    await prisma.post.delete({
+      where: { id },
+    });
+  }
+
+  async addPostCategory(createBody: PostCategories) {
+    const category = await prisma.postCategories.create({
+      data: { ...createBody },
+    });
+
+    return category;
+  }
+
+  async getAllPostCategory(
+    filter: Partial<PostCategories>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
+    ignorePagination = false,
+  ): Promise<
+    | PostCategories[]
+    | {
+        results: PostCategories[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      }
+  > {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
+
+    const data = ignorePagination
+      ? await prisma.postCategories.findMany()
+      : await paginate<PostCategories, typeof prisma.postCategories>(
+          filter,
+          options,
+          prisma.postCategories,
+        );
+    return data;
   }
 }

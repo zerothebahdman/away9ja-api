@@ -61,7 +61,7 @@ route.post(
 );
 
 route.get(
-  '/admin/allCategories',
+  '/marketplace-category',
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {
     marketController.getAllCategory(req, res, next);

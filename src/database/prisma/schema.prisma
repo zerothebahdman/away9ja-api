@@ -50,21 +50,23 @@ model User {
 }
 
 model Post {
-  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body         String?       @db.VarChar(255)
-  user         User?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id      String?       @db.Uuid
-  post_type    PostType?
-  images       String[]
-  tags         String[]
-  location     String?
-  isApproved   Boolean?      @default(false)
-  isAnonymous  Boolean?      @default(false)
-  created_at   DateTime      @default(now())
-  update_at    DateTime?     @updatedAt
-  deleted_at   DateTime?
-  post_comment PostComment[]
-  post_likes   PostLikes[]
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body             String?         @db.VarChar(1000)
+  user             User?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id          String?         @db.Uuid
+  post_type        PostType?
+  category         PostCategories? @relation(fields: [post_category_id], references: [id])
+  post_category_id String?         @db.Uuid
+  images           String[]
+  tags             String[]
+  location         String?
+  isApproved       Boolean?        @default(false)
+  isAnonymous      Boolean?        @default(false)
+  created_at       DateTime        @default(now())
+  update_at        DateTime?       @updatedAt
+  deleted_at       DateTime?
+  post_comment     PostComment[]
+  post_likes       PostLikes[]
 
   @@map("Posts")
 }
@@ -95,6 +97,7 @@ model PostCategories {
   deleted_at      DateTime?
   PostComment     PostComment? @relation(fields: [post_comment_id], references: [id])
   post_comment_id String?      @db.Uuid
+  Post            Post[]
 
   @@map("post_categories")
 }

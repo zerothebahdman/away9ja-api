@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { MaritalStatus, AccountStatus } from '../../config/constants';
+import { MaritalStatus, AccountStatus, ROLE } from '../../config/constants';
 import { objectId } from './Custom.validator';
 
 export const LoginValidator = {
@@ -61,6 +61,7 @@ export const CreateUserValidator = {
     address: Joi.string().required().lowercase(),
     stateOfOrigin: Joi.string().required().lowercase(),
     inviteCode: Joi.string().required(),
+    role: Joi.string().valid(...Object.values(ROLE)),
   }),
 };
 

@@ -49,9 +49,10 @@ CREATE TABLE "Users" (
 -- CreateTable
 CREATE TABLE "Posts" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "body" VARCHAR(255),
+    "body" VARCHAR(1000),
     "user_id" UUID,
     "post_type" "PostType",
+    "post_category_id" UUID,
     "images" TEXT[],
     "tags" TEXT[],
     "location" TEXT,
@@ -189,6 +190,9 @@ CREATE UNIQUE INDEX "Users_password_reset_token_key" ON "Users"("password_reset_
 
 -- AddForeignKey
 ALTER TABLE "Posts" ADD CONSTRAINT "Posts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Posts" ADD CONSTRAINT "Posts_post_category_id_fkey" FOREIGN KEY ("post_category_id") REFERENCES "post_categories"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Post_Comments" ADD CONSTRAINT "Post_Comments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "Users"("id") ON DELETE CASCADE ON UPDATE CASCADE;

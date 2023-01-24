@@ -8,6 +8,7 @@ import {
 } from '../../../validators/SocialPost.validator';
 import { restrictAccessTo } from '../../middlewares/role.middleware';
 import { ROLE } from '../../../../config/constants';
+import { addCategoryValidator } from '../../../validators/marketPlace.validator';
 
 const route = Router();
 
@@ -87,12 +88,36 @@ route
     },
   );
 route
-  .route('/approve-anonymous-post/:postId')
+  .route('/anonymous-post/:postId')
   .patch(
     isUserAuthenticated,
     restrictAccessTo(ROLE.ADMIN),
     (req: Request, res: Response, next: NextFunction) => {
       socialController.approveAnonymousPost(req, res, next);
+    },
+  )
+  .delete(
+    isUserAuthenticated,
+    restrictAccessTo(ROLE.ADMIN),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.deleteAnonymousPost(req, res, next);
+    },
+  );
+
+route
+  .route('/post-categories')
+  .get(
+    isUserAuthenticated,
+    validate(addCategoryValidator),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.getAllPostCategory(req, res, next);
+    },
+  )
+  .post(
+    isUserAuthenticated,
+    restrictAccessTo(ROLE.ADMIN),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.addPostCategory(req, res, next);
     },
   );
 

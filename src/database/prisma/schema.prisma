@@ -82,8 +82,21 @@ model PostComment {
   deleted_at          DateTime?
   parent_post_comment ParentChildComment[] @relation("parent_post_comment")
   child_post_comment  ParentChildComment[] @relation("child_post_comment")
+  post_categories     PostCategories[]
 
   @@map("Post_Comments")
+}
+
+model PostCategories {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String       @db.VarChar(255)
+  created_at      DateTime     @default(now())
+  update_at       DateTime?    @updatedAt
+  deleted_at      DateTime?
+  PostComment     PostComment? @relation(fields: [post_comment_id], references: [id])
+  post_comment_id String?      @db.Uuid
+
+  @@map("post_categories")
 }
 
 model PostLikes {
@@ -116,7 +129,7 @@ model ParentChildComment {
   @@map("parent_child_comments")
 }
 
-model Categories {
+model MarketPlaceCategories {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String        @db.VarChar(255)
   created_at  DateTime      @default(now())
@@ -124,24 +137,24 @@ model Categories {
   deleted_at  DateTime?
   marketPlace marketPlace[]
 
-  @@map("categories")
+  @@map("MarketPlaceCategories")
 }
 
 model marketPlace {
-  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name               String               @db.VarChar(255)
-  location           String?              @db.VarChar(255)
-  user               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id            String?              @db.Uuid
-  category           Categories?          @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category_id        String?              @db.Uuid
-  description        String?              @db.VarChar(255)
-  photos             String[]
-  amount             Float                @db.DoublePrecision
-  created_at         DateTime             @default(now())
-  updated_at         DateTime?            @updatedAt
-  deleted_at         DateTime?
-  marketPlaceComment marketPlaceComment[]
+  id                      String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String                 @db.VarChar(255)
+  location                String?                @db.VarChar(255)
+  user                    User?                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id                 String?                @db.Uuid
+  marketplace_category    MarketPlaceCategories? @relation(fields: [marketplace_category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketplace_category_id String?                @db.Uuid
+  description             String?                @db.VarChar(255)
+  photos                  String[]
+  amount                  Float                  @db.DoublePrecision
+  created_at              DateTime               @default(now())
+  updated_at              DateTime?              @updatedAt
+  deleted_at              DateTime?
+  marketPlaceComment      marketPlaceComment[]
 
   @@map("marketPlace")
 }

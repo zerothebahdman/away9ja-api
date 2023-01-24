@@ -79,10 +79,18 @@ route.post(
 );
 
 route.get(
-  '/marketPlaceComment/maincomment/:marketItemId',
+  '/marketPlaceComment/maincomment-author/:marketItemId',
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {
-    marketController.getMarketPlaceComment(req, res, next);
+    marketController.getMarketPlaceCommentByAuthor(req, res, next);
+  },
+);
+
+route.get(
+  '/marketPlaceComment/maincomment-user/:marketItemId',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    marketController.getMarketPlaceCommentByUser(req, res, next);
   },
 );
 

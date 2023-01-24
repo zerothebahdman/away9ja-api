@@ -170,16 +170,40 @@ export default class MarketController {
     }
   }
 
-  async getMarketPlaceComment(
+  async getMarketPlaceCommentByAuthor(
     req: RequestType,
     res: Response,
     next: NextFunction,
   ) {
     try {
-      const comments: any = await this.marketService.getMarketPlaceComments({
-        type: req.query.type,
-        marketPlaceId: req.params.marketplaceitemid,
+      const comments: any =
+        await this.marketService.getMarketPlaceCommentsByAuthor({
+          type: req.query.type,
+          marketPlaceId: req.params.marketplaceitemid,
+        });
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        comments,
       });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async getMarketPlaceCommentByUser(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const comments: any =
+        await this.marketService.getMarketPlaceCommentsByUser({
+          type: req.query.type,
+          marketPlaceId: req.params.marketplaceitemid,
+          user_id: req.user.id,
+        });
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         comments,
@@ -199,7 +223,7 @@ export default class MarketController {
     try {
       const marketPlaceSubCommentsIds =
         await this.marketService.getMarketPlaceSubComments({
-          parent_market_place_comment_id: req.params.marketPlace_Comment_Id,
+          parent_market_place_comment_id: req.params.marketPlace_comment_id,
         });
       const marketPlaceSubComments: marketPlaceComment[] = [];
       await Promise.all(

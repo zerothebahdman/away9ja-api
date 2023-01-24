@@ -157,8 +157,26 @@ export default class MarketPlaceService {
     return comment;
   }
 
-  async getMarketPlaceComments(
+  async getMarketPlaceCommentsByAuthor(
+    //this is to retrieve comments by a user who posted an Item
     filter: { type?: CommentType; post_id: string } | qs.ParsedQs,
+  ) {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
+    const data = await prisma.marketPlaceComment.findMany({
+      where: {
+        ...filter,
+      },
+    });
+    return data;
+  }
+
+  async getMarketPlaceCommentsByUser(
+    //this is to retrieve comments by a user who commented on a posted Item
+    filter:
+      | { type?: CommentType; post_id: string; user_id: string }
+      | qs.ParsedQs,
   ) {
     if (typeof filter === 'object' && filter !== null) {
       Object.assign(filter, { deleted_at: null });

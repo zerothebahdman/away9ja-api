@@ -1,4 +1,6 @@
 import Joi from 'joi';
+import { MaritalStatus, AccountStatus, ROLE } from '../../config/constants';
+import { objectId } from './Custom.validator';
 
 export const LoginValidator = {
   body: Joi.object().keys({
@@ -25,6 +27,9 @@ export const CreateUserValidator = {
     fullName: Joi.string().min(3).lowercase().max(40).required(),
     username: Joi.string().min(3).lowercase().max(40).required(),
     businessName: Joi.string().min(3).lowercase().max(40).required(),
+    maritalStatus: Joi.string()
+      .valid(...Object.values(MaritalStatus))
+      .required(),
     email: Joi.string().email().lowercase().required().messages({
       'string.email': 'Oops!, you need to provide valid email address',
       'string.required': 'Oops!, you have to specify an email address',
@@ -55,7 +60,8 @@ export const CreateUserValidator = {
     gender: Joi.string().required().valid('male', 'female'),
     address: Joi.string().required().lowercase(),
     stateOfOrigin: Joi.string().required().lowercase(),
-    inviteCode: Joi.string().optional().lowercase(),
+    inviteCode: Joi.string().required(),
+    role: Joi.string().valid(...Object.values(ROLE)),
   }),
 };
 
@@ -108,5 +114,14 @@ export const resendOtpValidator = {
     email: Joi.string().email().lowercase().required().messages({
       'any.required': 'Oops!, you have to specify an email address',
     }),
+  }),
+};
+
+export const referredUserValidator = {
+  body: Joi.object().keys({
+    user: Joi.custom(objectId).required(),
+    status: Joi.string()
+      .valid(...Object.values(AccountStatus))
+      .required(),
   }),
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction } from 'express';
 import AppException from '../exceptions/AppException';
 import EmailService from '../services/Email.service';
@@ -6,16 +7,13 @@ import prisma from '../database/model.module';
 import AuthService from '../services/Auth.service';
 import RESERVED_NAMES from '../utils/reservedNames';
 import HelperClass from '../utils/helper';
+import { AccountStatus } from '../../config/constants';
 const emailService = new EmailService();
 
 export default class CreateUser {
   constructor(private readonly authService: AuthService) {}
 
-  async createUser(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response<any, Record<string, any>>> {
+  async createUser(req: Request, res: Response, next: NextFunction) {
     try {
       const emailTaken = await prisma.user.findUnique({
         where: { email: req.body.email },
@@ -35,7 +33,22 @@ export default class CreateUser {
       if (RESERVED_NAMES.includes(req.body.username))
         throw new Error('Username unavailable, please choose another username');
 
-      req.body.referalCode = HelperClass.generateRandomChar(6, 'upper-num');
+      req.body.referralCode = HelperClass.generateRandomChar(6, 'upper-num');
+
+      req.body.status = AccountStatus.PENDING;
+
+      if (req.body.role !== 'admin') {
+        /** Save the referral and referrer details */
+        const referrer = await prisma.user.findUnique({
+          where: { referralCode: req.body.inviteCode },
+        });
+
+        if (!referrer) {
+          return next(
+            new AppException('Invalid referral code', httpStatus.BAD_REQUEST),
+          );
+        }
+      }
 
       /** if user does not exist create the user using the user service */
       const { user, OTP_CODE } = await this.authService.createUser(req.body);
@@ -44,7 +57,7 @@ export default class CreateUser {
       await emailService._sendUserEmailVerificationEmail(
         user.fullName,
         user.email,
-        OTP_CODE
+        OTP_CODE,
       );
 
       return res.status(httpStatus.OK).json({
@@ -53,9 +66,7 @@ export default class CreateUser {
         user,
       });
     } catch (err: any) {
-      return next(
-        new AppException(err.message, err.status || httpStatus.BAD_REQUEST)
-      );
+      return next(new AppException(err.message, err.status));
     }
   }
 }

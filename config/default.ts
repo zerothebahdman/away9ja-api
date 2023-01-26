@@ -6,9 +6,9 @@ const envVarsSchema = Joi.object()
   .keys({
     NODE_ENV: Joi.string()
       .required()
-      .valid('development', 'production', 'test'),
-    PORT: Joi.number().default(8080).required(),
-    FRONTEND_APP_URL: Joi.string().required().label('Frontend APP URL'),
+      .valid('development', 'production', 'test', 'staging'),
+    PORT: Joi.number(),
+    FRONTEND_APP_URL: Joi.string().label('Frontend APP URL'),
     DATABASE_URL: Joi.string().required().label('Database URL'),
     APP_NAME: Joi.string().required().label('App Name').default('AGSAAP'),
     JWT_ACCESS_TOKEN_EXPIRES: Joi.string()
@@ -27,9 +27,6 @@ const envVarsSchema = Joi.object()
     CLOUDINARY_NAME: Joi.string().label('Cloudinary Name'),
     CLOUDINARY_API_KEY: Joi.string().label('Cloudinary API Key'),
     CLOUDINARY_API_SECRET: Joi.string().label('Cloudinary API Secret'),
-    CRON_SCHEDULE_DELETE_USER_ACCOUNT_IF_NOT_VERIFIED: Joi.string().label(
-      'Cron Schedule Delete User Account If Not Verified'
-    ),
   })
   .unknown();
 const { value: envVars, error } = envVarsSchema
@@ -45,6 +42,7 @@ export default {
   FRONTEND_APP_URL: envVars.FRONTEND_APP_URL,
   DATABASE_URL: envVars.DATABASE_URL,
   port: envVars.PORT,
+  appName: envVars.APP_NAME,
   jwtAccessTokenExpiration: envVars.JWT_ACCESS_TOKEN_EXPIRES,
   jwtRefreshTokenExpiration: envVars.JWT_REFRESH_TOKEN_EXPIRES,
   name: envVars.APP_NAME,

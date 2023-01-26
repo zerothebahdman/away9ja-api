@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express';
 import type { ErrorRequestHandler } from 'express';
 import httpStatus from 'http-status';
 import AppException from '../../exceptions/AppException';
+import config from '../../../config/default';
 
 export interface Error {
   statusCode: number;
@@ -33,7 +35,7 @@ export const ErrorConverter = (
   err: any,
   _req: Request,
   _res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   let error = err;
   if (!(error instanceof AppException)) {
@@ -48,14 +50,14 @@ export const ErrorHandler: ErrorRequestHandler = (
   err: Error,
   _req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   err.statusCode = err.statusCode || httpStatus.BAD_REQUEST;
   err.status = err.status || 'error';
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.env === 'development') {
     setDevError(err, res);
-  } else if (process.env.NODE_ENV === 'production') {
+  } else if (config.env === 'production' || config.env === 'staging') {
     setProductionError(err, res);
   }
   next();

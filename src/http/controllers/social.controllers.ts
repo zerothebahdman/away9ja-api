@@ -7,15 +7,19 @@ import httpStatus from 'http-status';
 import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
 import { CommentType } from '../../../config/constants';
-import { PostComment } from '@prisma/client';
+import { ParentChildComment, PostComment } from '@prisma/client';
 
 export default class SocialController {
   constructor(private readonly socialService: SocialService) {}
 
   async createPost(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const feed = { user_id: req.user.id, ...req.body };
-      const { post } = await this.socialService.createPost(feed);
+      req.body.user_id = req.user.id;
+      req.body.isAnonymous === true
+        ? (req.body.isApproved = false)
+        : (req.body.isApproved = true);
+
+      const post = await this.socialService.createPost(req.body);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,
@@ -28,16 +32,36 @@ export default class SocialController {
     }
   }
 
+  async likePost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const { message } = await this.socialService.likePost({
+        user_id: req.user.id,
+        post_id: req.params.post_id,
+      });
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
   async createComment(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const parentComment = req.body.parent_post_comment_id;
+      const parentComment: string = req.body.parent_post_comment_id;
       delete req.body.parent_post_comment_id;
       const commentBody = { user_id: req.user.id, ...req.body };
       const comment = await this.socialService.createComment(commentBody);
       if (req.body.type === CommentType.SUB_COMMENT) {
-        const subCommentBody = {
-          parent_post_comment_id: parentComment as string,
-          child_post_comment_id: comment?.id as string,
+        const subCommentBody: Pick<
+          ParentChildComment,
+          'parent_post_comment_id' | 'child_post_comment_id'
+        > = {
+          parent_post_comment_id: parentComment,
+          child_post_comment_id: comment?.id,
         };
         await this.socialService.createSubComment(subCommentBody);
       }
@@ -193,7 +217,8 @@ export default class SocialController {
   }
   async getAllPost(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const filter = pick(req.query, ['user_id']);
+      const filter = pick(req.query, ['user_id', 'post_category_id']);
+      Object.assign(filter, { isApproved: true });
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const posts = await this.socialService.getAllPost(filter, options);
       return res.status(httpStatus.ACCEPTED).json({
@@ -215,10 +240,7 @@ export default class SocialController {
         user_id: req.user.id,
         ...req.body,
       };
-      const { post } = await this.socialService.updateUserPostById(
-        post_id,
-        feed,
-      );
+      const post = await this.socialService.updateUserPostById(post_id, feed);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,
@@ -238,11 +260,102 @@ export default class SocialController {
   ): Promise<void | Response<any, Record<string, any>>> {
     try {
       const post_id = req.query.id.toString();
-      const { post } = await this.socialService.deleteUserPostById(post_id);
+      const post = await this.socialService.deleteUserPostById(post_id);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `This feed has been deleted`,
         post,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async getAnonymousPost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const filter = pick(req.query, ['user_id']);
+      Object.assign(filter, { isAnonymous: true, isApproved: false });
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
+      const posts = await this.socialService.getAnonymousPost(filter, options);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        posts,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async approveAnonymousPost(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const post_id = req.params.postId.toString();
+      const post = await this.socialService.approveAnonymousPost(post_id);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: `The post has been approved`,
+        post,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async deleteAnonymousPost(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const post_id = req.params.postId.toString();
+      await this.socialService.deleteAnonymousPost(post_id);
+      return res.status(httpStatus.NO_CONTENT);
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async addPostCategory(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const category = await this.socialService.addPostCategory(req.body);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: 'Post Category has been updated with this category',
+        category,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async getAllPostCategory(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const filter = pick(req.query, ['user_id']);
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
+      const postCategories = await this.socialService.getAllPostCategory(
+        filter,
+        options,
+      );
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        postCategories,
       });
     } catch (err: any) {
       return next(

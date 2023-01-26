@@ -28,6 +28,14 @@ route.get(
   },
 );
 
+route.get(
+  '/get-item/:itemId',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    marketController.getMarketItem(req, res, next);
+  },
+);
+
 route.patch(
   '/edit-item',
   isUserAuthenticated,

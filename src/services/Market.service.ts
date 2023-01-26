@@ -17,6 +17,11 @@ export default class MarketPlaceService {
     return marketPlaceItem;
   }
 
+  async getMarketItemById(id: string): Promise<marketPlace> {
+    const data = await prisma.marketPlace.findUnique({ where: { id } });
+    return data;
+  }
+
   async getAllMyItem(
     filter: Partial<marketPlace>,
     options: {

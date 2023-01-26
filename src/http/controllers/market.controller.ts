@@ -42,6 +42,22 @@ export default class MarketController {
     }
   }
 
+  async getMarketItem(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const marketItem = await this.marketService.getMarketItemById(
+        req.params.itemId,
+      );
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        marketItem,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
   async editMarketItem(req: RequestType, res: Response, next: NextFunction) {
     try {
       const marketItemId = req.query.id.toString();

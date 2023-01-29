@@ -1,17 +1,30 @@
-// import { Router } from 'express';
-// import { createUser } from '../../../authentication/authentication.module';
-// import { userController } from '../../controllers/controllers.module';
-// import { isAuthenticated } from '../../middlewares/auth.middleware';
+import { Router } from 'express';
+import { userController } from '../../controllers/controllers.module';
+import { isUserAuthenticated } from '../../middlewares/auth.middleware';
+import validate from '../../middlewares/validate';
+import { updateUserAccount } from '../../../validators/User.validation';
 
-// const route = Router();
+const route = Router();
 
-// route
-//   .route('/')
-//   .get(isAuthenticated, (req, res, next) => {
-//     userController.getAllUsers(req, res, next);
-//   })
-//   .post((req, res, next) => {
-//     createUser.createUser(req, res, next);
-//   });
+route.route('/account-status').get((req, res, next) => {
+  userController.getAccountStatus(req, res, next);
+});
 
-// export default route;
+route
+  .route('/me')
+  .get(isUserAuthenticated, (req, res, next) => {
+    userController.getMyProfile(req, res, next);
+  })
+  .patch(isUserAuthenticated, validate(updateUserAccount), (req, res, next) => {
+    userController.updateMyProfile(req, res, next);
+  });
+
+route.get('/:userId', isUserAuthenticated, (req, res, next) => {
+  userController.getUserProfile(req, res, next);
+});
+
+route.route('/invite').post(isUserAuthenticated, (req, res, next) => {
+  userController.inviteUser(req, res, next);
+});
+
+export default route;

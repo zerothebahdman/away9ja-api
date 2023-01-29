@@ -28,6 +28,11 @@ export default class UserService {
     return data;
   }
 
+  async getUser(filter: Partial<User>): Promise<User> {
+    const data = await prisma.user.findFirst({ where: filter });
+    return data;
+  }
+
   async getUserById(
     id: string,
     eagerLoad?: { include: { [key: string]: boolean } },
@@ -54,6 +59,11 @@ export default class UserService {
     return data;
   }
 
+  async getUserByUsername(username: string): Promise<User> {
+    const data = await prisma.user.findUnique({ where: { username } });
+    return data;
+  }
+
   async getReferredUsers(
     filter: Partial<User>,
     options: {
@@ -73,7 +83,9 @@ export default class UserService {
         total: number;
       }
   > {
-    const data = ignorePagination ? await prisma.user.findMany() : await paginate<User, typeof prisma.user>(filter, options, prisma.user);
+    const data = ignorePagination
+      ? await prisma.user.findMany()
+      : await paginate<User, typeof prisma.user>(filter, options, prisma.user);
     return data;
   }
 }

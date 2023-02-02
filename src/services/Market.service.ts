@@ -1,7 +1,7 @@
 import prisma from '../database/model.module';
 import {
   marketPlace,
-  Categories,
+  MarketPlaceCategories,
   marketPlaceComment,
   ParentChildComment,
 } from '@prisma/client';
@@ -104,8 +104,8 @@ export default class MarketPlaceService {
     return data;
   }
 
-  async addCategory(createBody: Categories) {
-    const category = await prisma.categories.create({
+  async addCategory(createBody: MarketPlaceCategories) {
+    const category = await prisma.MarketPlaceCategories.create({
       data: { ...createBody },
     });
 
@@ -113,7 +113,7 @@ export default class MarketPlaceService {
   }
 
   async getAllCategory(
-    filter: Partial<Categories>,
+    filter: Partial<MarketPlaceCategories>,
     options: {
       orderBy?: string;
       page?: string;
@@ -122,9 +122,9 @@ export default class MarketPlaceService {
     } = {},
     ignorePagination = false,
   ): Promise<
-    | Categories[]
+    | MarketPlaceCategories[]
     | {
-        results: Categories[];
+        results: MarketPlaceCategories[];
         page: number;
         limit: number;
         totalPages: number;
@@ -136,12 +136,11 @@ export default class MarketPlaceService {
     }
 
     const data = ignorePagination
-      ? await prisma.categories.findMany()
-      : await paginate<Categories, typeof prisma.categories>(
-          filter,
-          options,
-          prisma.categories,
-        );
+      ? await prisma.MarketPlaceCategories.findMany()
+      : await paginate<
+          MarketPlaceCategories,
+          typeof prisma.MarketPlaceCategories
+        >(filter, options, prisma.MarketPlaceCategories);
     return data;
   }
 

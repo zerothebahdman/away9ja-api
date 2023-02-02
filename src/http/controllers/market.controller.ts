@@ -196,7 +196,7 @@ export default class MarketController {
       const comments: any =
         await this.marketService.getMarketPlaceCommentsByAuthor({
           type: req.query.type,
-          marketPlaceId: req.params.marketplaceitemid,
+          marketPlaceId: req.params.marketItemId,
         });
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
@@ -218,7 +218,7 @@ export default class MarketController {
       const comments: any =
         await this.marketService.getMarketPlaceCommentsByUser({
           type: req.query.type,
-          marketPlaceId: req.params.marketplaceitemid,
+          marketPlaceId: req.params.marketItemId,
           user_id: req.user.id,
         });
       return res.status(httpStatus.ACCEPTED).json({
@@ -240,7 +240,7 @@ export default class MarketController {
     try {
       const marketPlaceSubCommentsIds =
         await this.marketService.getMarketPlaceSubComments({
-          parent_market_place_comment_id: req.params.marketPlace_comment_id,
+          parent_market_place_comment_id: req.params.marketplaceCommentId,
         });
       const marketPlaceSubComments: marketPlaceComment[] = [];
       await Promise.all(

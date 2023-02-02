@@ -78,7 +78,7 @@ route.get(
 );
 
 route.post(
-  '/create_marketPlace_Comment',
+  '/create-marketplace-comment',
   isUserAuthenticated,
   validate(createMarketPlaceCommentValidator),
   (req: Request, res: Response, next: NextFunction) => {
@@ -87,7 +87,7 @@ route.post(
 );
 
 route.get(
-  '/marketPlaceComment/maincomment-author/:market_Item_Id',
+  '/marketPlaceComment/maincomment-author/:marketItemId',
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {
     marketController.getMarketPlaceCommentByAuthor(req, res, next);
@@ -95,7 +95,7 @@ route.get(
 );
 
 route.get(
-  '/marketPlaceComment/maincomment-user/:market_Item_Id',
+  '/marketPlaceComment/maincomment-user/:marketItemId',
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {
     marketController.getMarketPlaceCommentByUser(req, res, next);
@@ -103,7 +103,7 @@ route.get(
 );
 
 route.get(
-  '/marketPlaceComment/subcomment/:marketPlace_comment_Id',
+  '/marketPlaceComment/subcomment/:marketplaceCommentId',
   isUserAuthenticated,
   (req: Request, res: Response, next: NextFunction) => {
     marketController.getMarketPlaceSubComment(req, res, next);

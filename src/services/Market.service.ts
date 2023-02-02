@@ -106,6 +106,7 @@ export default class MarketPlaceService {
 
   async addCategory(createBody: MarketPlaceCategories) {
     const category = await prisma.MarketPlaceCategories.create({
+
       data: { ...createBody },
     });
 
@@ -136,10 +137,11 @@ export default class MarketPlaceService {
     }
 
     const data = ignorePagination
+
       ? await prisma.MarketPlaceCategories.findMany()
       : await paginate<
           MarketPlaceCategories,
-          typeof prisma.MarketPlaceCategories
+          typeof prisma.marketPlaceCategories
         >(filter, options, prisma.MarketPlaceCategories);
     return data;
   }

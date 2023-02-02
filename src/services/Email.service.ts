@@ -4,6 +4,8 @@ import log from '../logging/logger';
 import PASSWORD_RESET_EMAIL from '../mail/password-reset';
 import WELCOME_EMAIL from '../mail/welcome-email';
 import EMAIL_VERIFICATION from '../mail/email-verification';
+import USER_ACCOUNT_VERIFIED_BY_REFERRER from '../mail/account-verified';
+import USER_INVITATION from '../mail/user-invitation';
 const _nodeMailerModule = new NodemailerModule();
 
 const emailType: EmailType = {
@@ -12,6 +14,11 @@ const emailType: EmailType = {
   PASSWORD_RESET_SUCCESSFUL: ['Password Reset', 'password-reset-successful'],
   EMAIL_VERIFICATION: ['Email Verification Requested', 'email-verification'],
   PASSWORD_CHANGED: ['Password Changed', 'password-changed'],
+  ACCOUNT_VERIFIED: [
+    'Your referrer has verified your account',
+    'account-verified',
+  ],
+  USER_INVITATION: ['You have been invited to join', 'user-invitation'],
 };
 
 type Data = {
@@ -55,6 +62,14 @@ export default class EmailService {
         mailOptions.html = EMAIL_VERIFICATION(data.fullName, data.token);
         mailOptions.subject = `[${config.appName}] ${subject}`;
         break;
+      case 'account-verified':
+        mailOptions.html = USER_ACCOUNT_VERIFIED_BY_REFERRER(data.fullName);
+        mailOptions.subject = `[${config.appName}] ${subject}`;
+        break;
+      case 'user-invitation':
+        mailOptions.html = USER_INVITATION(data.fullName, data.code);
+        mailOptions.subject = `${subject} ${config.appName}`;
+        break;
     }
     await _nodeMailerModule.send(mailOptions);
     log.info(`Email on it's way to ${email}`);
@@ -84,6 +99,19 @@ export default class EmailService {
     return await this._sendMail('PASSWORD_RESET_INSTRUCTION', email, {
       fullName,
       token,
+    });
+  }
+
+  async sendUserAccountVerifiedEmail(to: string, fullName: string) {
+    return await this._sendMail('ACCOUNT_VERIFIED', to, {
+      fullName,
+    });
+  }
+
+  async sendUserInvitationEmail(to: string, fullName: string, code: string) {
+    return await this._sendMail('USER_INVITATION', to, {
+      fullName,
+      code,
     });
   }
 }

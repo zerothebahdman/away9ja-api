@@ -9,9 +9,13 @@ import SocialController from './social.controllers';
 import MarketController from './market.controller';
 import EventController from './event.controller';
 import EventService from '../../services/Event.service';
+import UserService from '../../services/User.service';
+import EmailService from '../../services/Email.service';
 
 export const socialController = new SocialController(new SocialService());
-export const userController = new UserController();
+export const userController = new UserController(
+  new UserService(),
+  new EmailService(),
+);
 export const eventController = new EventController(new EventService());
 export const marketController = new MarketController(new MarketService());
-

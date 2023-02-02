@@ -4,6 +4,7 @@
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["rhel-openssl-1.0.x", "native"]
+  // output        = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -21,12 +22,14 @@ model User {
   password                        String               @db.VarChar(255)
   phoneNumber                     String               @db.VarChar(255)
   gender                          Gender
+  role                            Role?                @default(user)
   maritalStatus                   MaritalStatus?
   businessName                    String?              @db.VarChar(255)
   address                         String               @db.VarChar(255)
   stateOfOrigin                   String               @db.VarChar(255)
-  referalCode                     String?              @unique @db.VarChar(255)
-  inviteCode                      String?              @unique @db.VarChar(255)
+  referralCode                    String?              @unique @db.VarChar(255)
+  inviteCode                      String?              @db.VarChar(255)
+  status                          AccountStatus?       @default(pending)
   is_email_verified               Boolean?             @default(false)
   email_verified_at               DateTime?
   email_verification_token        String?              @db.VarChar(255)
@@ -47,21 +50,23 @@ model User {
 }
 
 model Post {
-  id           String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  body         String?       @db.VarChar(255)
-  user         User?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id      String?       @db.Uuid
-  post_type    PostType?
-  images       String[]
-  tags         String[]
-  location     String?
-  isApproved   Boolean?      @default(false)
-  isAnonymous  Boolean?      @default(false)
-  created_at   DateTime      @default(now())
-  update_at    DateTime?     @updatedAt
-  deleted_at   DateTime?
-  post_comment PostComment[]
-  post_likes   PostLikes[]
+  id               String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  body             String?         @db.VarChar(1000)
+  user             User?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id          String?         @db.Uuid
+  post_type        PostType?
+  category         PostCategories? @relation(fields: [post_category_id], references: [id])
+  post_category_id String?         @db.Uuid
+  images           String[]
+  tags             String[]
+  location         String?
+  isApproved       Boolean?        @default(false)
+  isAnonymous      Boolean?        @default(false)
+  created_at       DateTime        @default(now())
+  update_at        DateTime?       @updatedAt
+  deleted_at       DateTime?
+  post_comment     PostComment[]
+  post_likes       PostLikes[]
 
   @@map("Posts")
 }
@@ -79,8 +84,22 @@ model PostComment {
   deleted_at          DateTime?
   parent_post_comment ParentChildComment[] @relation("parent_post_comment")
   child_post_comment  ParentChildComment[] @relation("child_post_comment")
+  post_categories     PostCategories[]
 
   @@map("Post_Comments")
+}
+
+model PostCategories {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String       @db.VarChar(255)
+  created_at      DateTime     @default(now())
+  update_at       DateTime?    @updatedAt
+  deleted_at      DateTime?
+  PostComment     PostComment? @relation(fields: [post_comment_id], references: [id])
+  post_comment_id String?      @db.Uuid
+  Post            Post[]
+
+  @@map("post_categories")
 }
 
 model PostLikes {
@@ -113,7 +132,7 @@ model ParentChildComment {
   @@map("parent_child_comments")
 }
 
-model Categories {
+model MarketPlaceCategories {
   id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name        String        @db.VarChar(255)
   created_at  DateTime      @default(now())
@@ -121,24 +140,24 @@ model Categories {
   deleted_at  DateTime?
   marketPlace marketPlace[]
 
-  @@map("categories")
+  @@map("MarketPlaceCategories")
 }
 
 model marketPlace {
-  id                 String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name               String               @db.VarChar(255)
-  location           String?              @db.VarChar(255)
-  user               User?                @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id            String?              @db.Uuid
-  category           Categories?          @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  category_id        String?              @db.Uuid
-  description        String?              @db.VarChar(255)
-  photos             String[]
-  amount             Float                @db.DoublePrecision
-  created_at         DateTime             @default(now())
-  updated_at         DateTime?            @updatedAt
-  deleted_at         DateTime?
-  marketPlaceComment marketPlaceComment[]
+  id                      String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String                 @db.VarChar(255)
+  location                String?                @db.VarChar(255)
+  user                    User?                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id                 String?                @db.Uuid
+  marketplace_category    MarketPlaceCategories? @relation(fields: [marketplace_category_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketplace_category_id String?                @db.Uuid
+  description             String?                @db.VarChar(255)
+  photos                  String[]
+  amount                  Float                  @db.DoublePrecision
+  created_at              DateTime               @default(now())
+  updated_at              DateTime?              @updatedAt
+  deleted_at              DateTime?
+  marketPlaceComment      marketPlaceComment[]
 
   @@map("marketPlace")
 }
@@ -198,4 +217,14 @@ enum MaritalStatus {
   married
   divorced
   widowed
+}
+
+enum AccountStatus {
+  pending
+  verified
+}
+
+enum Role {
+  admin
+  user
 }

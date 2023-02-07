@@ -45,6 +45,7 @@ model User {
   marketPlace                     marketPlace[]
   Event                           Event[]
   marketPlaceComment              marketPlaceComment[]
+  newbieCorner                    NewbieCorner[]
 
   @@map("Users")
 }
@@ -194,6 +195,33 @@ model Event {
   deleted_at  DateTime?
 
   @@map("events")
+}
+
+model NewbieCorner {
+  id              String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  heading         String          @db.VarChar(255)
+  body            String          @db.VarChar(255)
+  user            User?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id         String?         @db.Uuid
+  newbieTag       NewbieTag?      @relation(fields: [newbieTag_id], references: [id])
+  newbieTag_id    String?         @db.Uuid
+  created_at      DateTime        @default(now())
+  updated_at      DateTime?       @updatedAt
+  deleted_at      DateTime?
+
+  
+  @@map("NewbieCorner")
+}
+
+model NewbieTag {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name            String       @db.VarChar(255)
+  created_at      DateTime     @default(now())
+  update_at       DateTime?    @updatedAt
+  deleted_at      DateTime?
+  NewbieCorner    NewbieCorner[]
+
+  @@map("newbieTag")
 }
 
 enum Gender {

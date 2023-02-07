@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon server.ts",
-    "build": "prisma generate --schema=./src/database/prisma/schema.prisma && tsc && cp -R ./src/database/prisma ./build/src/database/prisma && cd ./build/src/ && mkdir certs && cd certs/ && openssl genrsa -out private_key.pem 4096 && openssl rsa -pubout -in private_key.pem -out public_key.pem && cd ../ && prisma migrate deploy --schema=./database/prisma/schema.prisma",
+    "build": "prisma generate --schema=./src/database/prisma/schema.prisma && rimraf ./build && tsc && cp -R ./src/database/prisma ./build/src/database/prisma && cd ./build/src/ && mkdir certs && cd certs/ && openssl genrsa -out private_key.pem 4096 && openssl rsa -pubout -in private_key.pem -out public_key.pem && cd ../ && prisma migrate deploy --schema=./database/prisma/schema.prisma",
     "docker:build": "tsc",
     "migrate:dev": "prisma migrate dev --schema=./src/database/prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema=./src/database/prisma/schema.prisma",
@@ -21,8 +21,8 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^4.8.1",
-    "@sentry/node": "^7.35.0",
-    "@sentry/tracing": "^7.35.0",
+    "@sentry/node": "^7.36.0",
+    "@sentry/tracing": "^7.36.0",
     "@types/bcrypt": "^5.0.0",
     "@types/config": "^0.0.41",
     "@types/cors": "^2.8.12",
@@ -67,7 +67,7 @@
     "prettier": "^2.8.1"
   },
   "engines": {
-    "node": ">=14.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   }
 }

@@ -10,7 +10,7 @@ export const addItemValidator = {
     category_id: Joi.string().min(3).lowercase().max(50),
     description: Joi.string().lowercase().max(100),
     photos: Joi.array().items(Joi.string()).optional(),
-    amount: Joi.number().required(),
+    amount: Joi.number().optional(),
   }),
 };
 

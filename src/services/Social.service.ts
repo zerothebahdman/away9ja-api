@@ -60,22 +60,25 @@ export default class SocialService {
       totalPages: number;
       total: number;
     };
-    newData.likesCount = await this.getPostLikesCount({ post_id: filter.id });
-    newData.commentsCount = await this.getPostCommentsCount({
-      post_id: filter.id,
-    });
-    newData.results.forEach((post: PostObj) => {
-      if (post.isAnonymous === true) {
-        post.user_id = 'anonymous';
-        delete post?.user;
-        const user = {
-          username: `user${HelperClass.generateRandomChar(4, 'num')}`,
-          profile_image: null as null,
-          fullName: 'Anonymous',
+    await Promise.all(
+      newData.results.map(async (post: PostObj) => {
+        if (post.isAnonymous === true) {
+          post.user_id = 'anonymous';
+          delete post?.user;
+          const user = {
+            username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+            profile_image: null as null,
+            fullName: 'Anonymous',
+          };
+          Object.assign(post, { user });
+        }
+        const stats = {
+          commentsCount: await this.getPostCommentsCount({ post_id: post.id }),
+          likesCount: await this.getPostLikesCount({ post_id: post.id }),
         };
-        Object.assign(post, { user });
-      }
-    });
+        Object.assign(post, { stats });
+      }),
+    );
     return newData;
   }
   async createPost(createBody: Post): Promise<Post> {

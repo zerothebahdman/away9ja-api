@@ -27,6 +27,10 @@ const envVarsSchema = Joi.object()
     CLOUDINARY_NAME: Joi.string().label('Cloudinary Name'),
     CLOUDINARY_API_KEY: Joi.string().label('Cloudinary API Key'),
     CLOUDINARY_API_SECRET: Joi.string().label('Cloudinary API Secret'),
+    SENTRY_DSN: Joi.string().description('Sentry DSN'),
+    ENABLE_SENTRY_LOGGING: Joi.bool()
+      .default(false)
+      .description('Enable Sentry Logging'),
   })
   .unknown();
 const { value: envVars, error } = envVarsSchema
@@ -65,5 +69,9 @@ export default {
   cronSchedule: {
     deleteUserAccountIfNotVerified:
       envVars.CRON_SCHEDULE_DELETE_USER_ACCOUNT_IF_NOT_VERIFIED,
+  },
+  sentry: {
+    enabled: envVars.ENABLE_SENTRY_LOGGING,
+    dsn: envVars.SENTRY_DSN,
   },
 };

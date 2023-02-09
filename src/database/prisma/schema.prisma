@@ -153,7 +153,7 @@ model marketPlace {
   marketplace_category_id String?                @db.Uuid
   description             String?                @db.VarChar(255)
   photos                  String[]
-  amount                  Float                  @db.DoublePrecision
+  amount                  Float?                 @db.DoublePrecision
   created_at              DateTime               @default(now())
   updated_at              DateTime?              @updatedAt
   deleted_at              DateTime?

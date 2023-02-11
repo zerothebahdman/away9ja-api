@@ -15,5 +15,7 @@ export const updateUserAccount = {
     gender: Joi.string().optional().valid('male', 'female'),
     address: Joi.string().optional().lowercase(),
     stateOfOrigin: Joi.string().optional().lowercase(),
+    avatar: Joi.string().optional(),
+    dob: Joi.date().optional(),
   }),
 };

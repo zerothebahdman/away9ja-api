@@ -25,6 +25,8 @@ model User {
   role                            Role?                @default(user)
   maritalStatus                   MaritalStatus?
   businessName                    String?              @db.VarChar(255)
+  dob                             DateTime?
+  avatar                          String?              @db.VarChar(255)
   address                         String               @db.VarChar(255)
   stateOfOrigin                   String               @db.VarChar(255)
   referralCode                    String?              @unique @db.VarChar(255)
@@ -84,20 +86,17 @@ model PostComment {
   deleted_at          DateTime?
   parent_post_comment ParentChildComment[] @relation("parent_post_comment")
   child_post_comment  ParentChildComment[] @relation("child_post_comment")
-  post_categories     PostCategories[]
 
   @@map("Post_Comments")
 }
 
 model PostCategories {
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String       @db.VarChar(255)
-  created_at      DateTime     @default(now())
-  update_at       DateTime?    @updatedAt
-  deleted_at      DateTime?
-  PostComment     PostComment? @relation(fields: [post_comment_id], references: [id])
-  post_comment_id String?      @db.Uuid
-  Post            Post[]
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String    @db.VarChar(255)
+  created_at DateTime  @default(now())
+  update_at  DateTime? @updatedAt
+  deleted_at DateTime?
+  Post       Post[]
 
   @@map("post_categories")
 }

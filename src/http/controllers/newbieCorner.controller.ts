@@ -47,8 +47,9 @@ export default class NewbieCornerController {
     next: NextFunction,
   ) {
     try {
+      const newbieArticle = { user_id: req.user.id, ...req.body };
       const newbieCornerArticle =
-        await this.newbieCornerService.createNewbieArticle(req.body);
+        await this.newbieCornerService.createNewbieArticle(newbieArticle);
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Newbie Corner has been Updated with your Article`,
@@ -67,7 +68,7 @@ export default class NewbieCornerController {
   ) {
     try {
       const newbieArticle = await this.newbieCornerService.getNewbieArticleById(
-        req.params.newbieArticleId,
+        req.params.articleId,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

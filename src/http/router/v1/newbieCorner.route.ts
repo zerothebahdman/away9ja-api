@@ -1,20 +1,18 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { newbieCornerController } from '../../controllers/controllers.module';
 import { isUserAuthenticated } from '../../middlewares/auth.middleware';
-// import validate from '../../middlewares/validate';
-// import {
-//   addItemValidator,
-//   addCategoryValidator,
-//   editItemValidator,
-//   createMarketPlaceCommentValidator,
-// } from '../../../validators/marketPlace.validator';
+import validate from '../../middlewares/validate';
+import {
+  newbieTagValidator,
+  createNewbieArticleValidator,
+} from '../../../validators/newbieCorner.validator';
 
 const route = Router();
 
 route.post(
   '/admin/add-newbie-Tag',
   isUserAuthenticated,
-  //validate(addCategoryValidator),
+  validate(newbieTagValidator),
   (req: Request, res: Response, next: NextFunction) => {
     newbieCornerController.addNewbieTag(req, res, next);
   },
@@ -30,7 +28,7 @@ route.get(
 route.post(
   '/create-newbie-article',
   isUserAuthenticated,
-  //validate(CreatePostValidator),
+  validate(createNewbieArticleValidator),
   (req: Request, res: Response, next: NextFunction) => {
     newbieCornerController.createNewbieArticle(req, res, next);
   },

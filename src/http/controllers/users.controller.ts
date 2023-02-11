@@ -137,4 +137,45 @@ export default class UserController {
       );
     }
   }
+
+  async getNotificationSettings(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const settings = await this.userService.getNotificationSettings(
+        req.user.id,
+      );
+      return res.status(httpStatus.OK).json({
+        status: 'success',
+        settings,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async updateNotificationSettings(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const settings = await this.userService.updateNotificationSettings(
+        req.user.id,
+        req.body,
+      );
+      return res.status(httpStatus.OK).json({
+        status: 'success',
+        settings,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

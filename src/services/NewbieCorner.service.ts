@@ -80,8 +80,33 @@ export default class NewbieCornerService {
         );
     return data;
   }
-  async getNewbieArticleById(id: string): Promise<NewbieCorner> {
-    const data = await prisma.newbieCorner.findUnique({ where: { id } });
+  async getNewbieArticleById(
+    id: string,
+    filter?: Partial<NewbieCorner>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
+    ignorePagination = false,
+  ): Promise<
+    | NewbieCorner
+    | {
+        results: NewbieCorner[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: string;
+      }
+  > {
+    const data = ignorePagination
+      ? await prisma.newbieCorner.findUnique({ where: { id } })
+      : await paginate<NewbieCorner, typeof prisma.newbieCorner>(
+          filter,
+          options,
+          prisma.newbieCorner,
+        );
     return data;
   }
 }

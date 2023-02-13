@@ -67,8 +67,12 @@ export default class NewbieCornerController {
     next: NextFunction,
   ) {
     try {
+      const filter = pick(req.query, ['user_id', 'id']);
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const newbieArticle = await this.newbieCornerService.getNewbieArticleById(
         req.params.articleId,
+        filter,
+        options,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

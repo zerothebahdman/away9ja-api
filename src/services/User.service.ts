@@ -96,6 +96,15 @@ export default class UserService {
     return data;
   }
 
+  async getUsersWhoCanReceiveNotification(
+    filter: Partial<NotificationSettings>,
+  ) {
+    const data = await prisma.notificationSettings.findMany({
+      where: { ...filter },
+    });
+    return data;
+  }
+
   async updateNotificationSettings(
     userId: string,
     updateBody: Partial<NotificationSettings>,

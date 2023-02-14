@@ -8,17 +8,44 @@ import pick from '../../utils/pick';
 import { CommentType } from '../../../config/constants';
 import { ParentChildComment, marketPlaceComment } from '@prisma/client';
 import HelperClass from '../../utils/helper';
+import UserService from '../../services/User.service';
+import sendNotificationToUser from '../../utils/sendNotification';
 
 export default class MarketController {
-  constructor(private readonly marketService: MarketService) {}
+  constructor(
+    private readonly marketService: MarketService,
+    private readonly userService: UserService,
+  ) {}
   async addMarketItem(req: RequestType, res: Response, next: NextFunction) {
     try {
       const marketItem = { user_id: req.user.id, ...req.body };
-      const Item = await this.marketService.addMarketItem(marketItem);
+      const item = await this.marketService.addMarketItem(marketItem);
+
+      const whoCanReceiveNotification =
+        await this.userService.getUsersWhoCanReceiveNotification({
+          postFeed: true,
+        });
+      const pushNotificationId: string[] = [];
+      const promise = whoCanReceiveNotification.map(async (user) => {
+        // get who can receive notification
+        const userThatCanReceiveNotification =
+          await this.userService.getUserById(user.userId);
+        if (userThatCanReceiveNotification.pushNotificationId) {
+          pushNotificationId.push(
+            userThatCanReceiveNotification.pushNotificationId,
+          );
+        }
+      });
+      await Promise.all(promise);
+      await sendNotificationToUser(
+        pushNotificationId,
+        `Freebies`,
+        `New freebies from ${req.user.fullName}`,
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: 'Your Listings has been updated with this item',
-        Item,
+        item,
       });
     } catch (err: any) {
       return next(

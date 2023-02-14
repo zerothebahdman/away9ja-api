@@ -24,6 +24,7 @@ model User {
   gender                          Gender
   role                            Role?                 @default(user)
   maritalStatus                   MaritalStatus?
+  pushNotificationId              String?               @db.VarChar(255)
   businessName                    String?               @db.VarChar(255)
   dob                             DateTime?
   avatar                          String?               @db.VarChar(255)

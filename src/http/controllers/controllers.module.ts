@@ -12,7 +12,10 @@ import EventService from '../../services/Event.service';
 import UserService from '../../services/User.service';
 import EmailService from '../../services/Email.service';
 
-export const socialController = new SocialController(new SocialService());
+export const socialController = new SocialController(
+  new SocialService(),
+  new UserService(),
+);
 export const userController = new UserController(
   new UserService(),
   new EmailService(),

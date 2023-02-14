@@ -42,6 +42,9 @@ export default class LoginUser {
         next(new AppException(`Oops!, your referrer has to verify you`, 403));
 
       const token = await this.authService.loginUser(_userExists);
+      await this.userService.updateUserById(_userExists.id, {
+        pushNotificationId: req.body.pushNotificationId,
+      });
 
       return res.status(httpStatus.ACCEPTED).json({
         user: HelperClass.removeUnwantedProperties(_userExists, [

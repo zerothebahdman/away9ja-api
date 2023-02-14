@@ -8,9 +8,14 @@ import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
 import { CommentType } from '../../../config/constants';
 import { ParentChildComment, PostComment } from '@prisma/client';
+import UserService from '../../services/User.service';
+import sendNotificationToUser from '../../utils/sendNotification';
 
 export default class SocialController {
-  constructor(private readonly socialService: SocialService) {}
+  constructor(
+    private readonly socialService: SocialService,
+    private readonly userService: UserService,
+  ) {}
 
   async createPost(req: RequestType, res: Response, next: NextFunction) {
     try {
@@ -20,6 +25,27 @@ export default class SocialController {
         : (req.body.isApproved = true);
 
       const post = await this.socialService.createPost(req.body);
+      const whoCanReceiveNotification =
+        await this.userService.getUsersWhoCanReceiveNotification({
+          postFeed: true,
+        });
+      const pushNotificationId: string[] = [];
+      const promise = whoCanReceiveNotification.map(async (user) => {
+        // get who can receive notification
+        const userThatCanReceiveNotification =
+          await this.userService.getUserById(user.userId);
+        if (userThatCanReceiveNotification.pushNotificationId) {
+          pushNotificationId.push(
+            userThatCanReceiveNotification.pushNotificationId,
+          );
+        }
+      });
+      await Promise.all(promise);
+      await sendNotificationToUser(
+        pushNotificationId,
+        `Updated article feed`,
+        `${req.user.fullName} just posted an article`,
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Your feeds has been Updated`,

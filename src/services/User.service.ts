@@ -1,5 +1,5 @@
 import prisma from '../database/model.module';
-import { User } from '@prisma/client';
+import { NotificationSettings, User } from '@prisma/client';
 import paginate from '../utils/paginate';
 
 export default class UserService {
@@ -86,6 +86,42 @@ export default class UserService {
     const data = ignorePagination
       ? await prisma.user.findMany()
       : await paginate<User, typeof prisma.user>(filter, options, prisma.user);
+    return data;
+  }
+
+  async getNotificationSettings(userId: string) {
+    const data = await prisma.notificationSettings.findUnique({
+      where: { userId },
+    });
+    return data;
+  }
+
+  async getUsersWhoCanReceiveNotification(
+    filter: Partial<NotificationSettings>,
+  ) {
+    const data = await prisma.notificationSettings.findMany({
+      where: { ...filter },
+    });
+    return data;
+  }
+
+  async updateNotificationSettings(
+    userId: string,
+    updateBody: Partial<NotificationSettings>,
+  ) {
+    const notificationExists = await prisma.notificationSettings.findUnique({
+      where: { userId },
+    });
+    if (!notificationExists) {
+      const data = await prisma.notificationSettings.create({
+        data: { userId, ...updateBody },
+      });
+      return data;
+    }
+    const data = await prisma.notificationSettings.update({
+      where: { userId },
+      data: updateBody,
+    });
     return data;
   }
 }

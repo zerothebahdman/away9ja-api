@@ -10,11 +10,14 @@ import {
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
 import HelperClass from '../utils/helper';
+import UserService from './User.service';
+import sendNotificationToUser from '../utils/sendNotification';
 
 interface PostObj extends Post {
   user: User;
 }
 export default class SocialService {
+  constructor(private readonly userService: UserService) {}
   async getAllPost(
     filter: Partial<Post>,
     options: {
@@ -172,6 +175,35 @@ export default class SocialService {
     await prisma.postLikes.create({
       data: { user_id, post_id },
     });
+    const user = await prisma.user.findUnique({
+      where: { id: user_id },
+    });
+    const ownerOfPost = await prisma.post.findUnique({
+      where: { id: post_id },
+    });
+    const whoCanReceiveNotification =
+      await this.userService.getUsersWhoCanReceiveNotification({
+        postFeed: true,
+        userId: ownerOfPost.user_id,
+      });
+    const pushNotificationId: string[] = [];
+    const promise = whoCanReceiveNotification.map(async (user) => {
+      // get who can receive notification
+      const userThatCanReceiveNotification = await this.userService.getUserById(
+        user.userId,
+      );
+      if (userThatCanReceiveNotification.pushNotificationId) {
+        pushNotificationId.push(
+          userThatCanReceiveNotification.pushNotificationId,
+        );
+      }
+    });
+    await Promise.all(promise);
+    await sendNotificationToUser(
+      pushNotificationId,
+      `Post liked`,
+      `${user.username} liked your post`,
+    );
     return { message: 'Post liked' };
   }
 

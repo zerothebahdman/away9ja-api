@@ -19,3 +19,13 @@ export const updateUserAccount = {
     dob: Joi.date().optional(),
   }),
 };
+
+export const userNotificationSettings = {
+  body: Joi.object().keys({
+    events: Joi.boolean().optional(),
+    newbieCornerArticles: Joi.boolean().optional(),
+    marketPlace: Joi.boolean().optional(),
+    postFeed: Joi.boolean().optional(),
+    directMessages: Joi.boolean().optional(),
+  }),
+};

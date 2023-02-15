@@ -67,7 +67,7 @@ export default class NewbieCornerController {
     next: NextFunction,
   ) {
     try {
-      const filter = pick(req.query, ['user_id', 'id']);
+      const filter = { id: req.params.articleId };
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const newbieArticle = await this.newbieCornerService.getNewbieArticleById(
         req.params.articleId,

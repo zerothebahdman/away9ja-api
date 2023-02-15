@@ -4,6 +4,7 @@ import socialRoute from './social.route';
 import marketRoute from './market.route';
 import eventRoute from './event.route';
 import userRoute from './user.route';
+import newbieCornerRoute from './newbieCorner.route';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ const defaultRoutes = [
   { path: '/social', route: socialRoute },
   { path: '/market', route: marketRoute },
   { path: '/event', route: eventRoute },
+  { path: '/newbieCorner', route: newbieCornerRoute },
 ];
 
 defaultRoutes.forEach(({ path, route }) => {

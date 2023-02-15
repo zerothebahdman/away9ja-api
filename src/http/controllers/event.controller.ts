@@ -6,9 +6,14 @@ import pick from '../../utils/pick';
 import AppException from '../../exceptions/AppException';
 import { RequestType } from '../middlewares/auth.middleware';
 import moment from 'moment';
+import UserService from '../../services/User.service';
+import sendNotificationToUser from '../../utils/sendNotification';
 
 export default class EventController {
-  constructor(private readonly eventService: EventService) {}
+  constructor(
+    private readonly eventService: EventService,
+    private readonly userService: UserService,
+  ) {}
 
   async getEvents(req: Request, res: Response, next: NextFunction) {
     try {
@@ -55,6 +60,27 @@ export default class EventController {
       req.body.date = moment(req.body.date).format('YYYY-MM-DD').toString();
       req.body.time = moment(req.body.time, 'HH:mm').format('h:mm A');
       const event = await this.eventService.createEvent(req.body);
+      const whoCanReceiveNotification =
+        await this.userService.getUsersWhoCanReceiveNotification({
+          events: true,
+        });
+      const pushNotificationId: string[] = [];
+      const promise = whoCanReceiveNotification.map(async (user) => {
+        // get who can receive notification
+        const userThatCanReceiveNotification =
+          await this.userService.getUserById(user.userId);
+        if (userThatCanReceiveNotification.pushNotificationId) {
+          pushNotificationId.push(
+            userThatCanReceiveNotification.pushNotificationId,
+          );
+        }
+      });
+      await Promise.all(promise);
+      await sendNotificationToUser(
+        pushNotificationId,
+        `New Event`,
+        `New Event has been created`,
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         message: `Event has been created`,

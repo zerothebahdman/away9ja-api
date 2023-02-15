@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon server.ts",
-    "build": "prisma generate --schema=./src/database/prisma/schema.prisma && tsc && cp -R ./src/database/prisma ./build/src/database/prisma && cd ./build/src/ && mkdir certs && cd certs/ && openssl genrsa -out private_key.pem 4096 && openssl rsa -pubout -in private_key.pem -out public_key.pem && cd ../ && prisma migrate deploy --schema=./database/prisma/schema.prisma",
+    "build": "prisma generate --schema=./src/database/prisma/schema.prisma && rimraf ./build && tsc && cp -R ./src/database/prisma ./build/src/database/prisma && cd ./build/src/ && mkdir certs && cd certs/ && openssl genrsa -out private_key.pem 4096 && openssl rsa -pubout -in private_key.pem -out public_key.pem && cd ../ && prisma migrate deploy --schema=./database/prisma/schema.prisma",
     "docker:build": "tsc",
     "migrate:dev": "prisma migrate dev --schema=./src/database/prisma/schema.prisma",
     "prisma:studio": "prisma studio --schema=./src/database/prisma/schema.prisma",
@@ -20,9 +20,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.8.1",
-    "@sentry/node": "^7.35.0",
-    "@sentry/tracing": "^7.35.0",
+    "@prisma/client": "^4.10.1",
+    "@sentry/node": "^7.36.0",
+    "@sentry/tracing": "^7.36.0",
     "@types/bcrypt": "^5.0.0",
     "@types/config": "^0.0.41",
     "@types/cors": "^2.8.12",
@@ -43,6 +43,8 @@
     "express": "^4.17.3",
     "express-rate-limit": "^6.7.0",
     "express-sslify": "^1.2.0",
+    "fcm-node": "^1.6.1",
+    "firebase-admin": "^11.5.0",
     "helmet": "^6.0.0",
     "hpp": "^0.2.3",
     "http-status": "^1.5.3",
@@ -54,7 +56,7 @@
     "nodemailer": "^6.7.2",
     "pino": "^7.8.0",
     "pino-pretty": "^7.5.1",
-    "prisma": "^4.8.1",
+    "prisma": "^4.10.1",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.3"
@@ -67,7 +69,7 @@
     "prettier": "^2.8.1"
   },
   "engines": {
-    "node": ">=14.0.0",
+    "node": ">=18.0.0",
     "npm": ">=8.0.0"
   }
 }

@@ -14,13 +14,25 @@ import EventService from '../../services/Event.service';
 import UserService from '../../services/User.service';
 import EmailService from '../../services/Email.service';
 
-export const socialController = new SocialController(new SocialService());
+export const socialController = new SocialController(
+  new SocialService(new UserService()),
+  new UserService(),
+);
 export const userController = new UserController(
   new UserService(),
   new EmailService(),
 );
+
 export const eventController = new EventController(new EventService());
 export const marketController = new MarketController(new MarketService());
 export const newbieCornerController = new NewbieCornerController(
   new NewbieCornerService(),
+);
+export const eventController = new EventController(
+  new EventService(),
+  new UserService(),
+);
+export const marketController = new MarketController(
+  new MarketService(),
+  new UserService(),
 );

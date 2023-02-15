@@ -22,6 +22,7 @@ export enum AccountStatus {
 }
 
 export enum ROLE {
-  ADMIN = 'admin',
-  USER = 'user',
+  ADMIN = 'admin', // can invite an unlimited number of users
+  USER = 'user', // can invite 5 users
+  EXCLUSIVE_USER = 'exclusive_user', // can invite 10 users
 }

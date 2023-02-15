@@ -7,10 +7,10 @@ export const addItemValidator = {
       'string.max': 'You have exceeded more than 50 characters',
     }),
     location: Joi.string().min(3).lowercase().max(20),
-    category_id: Joi.string().min(3).lowercase().max(50),
+    marketplace_category_id: Joi.string().min(3).lowercase().max(50).optional(),
     description: Joi.string().lowercase().max(100),
-    photos: Joi.array().items(Joi.string()).optional(),
-    amount: Joi.number().required(),
+    photos: Joi.array().items(Joi.string()).required(),
+    amount: Joi.number().optional(),
   }),
 };
 
@@ -25,9 +25,10 @@ export const editItemValidator = {
       })
       .optional(),
     location: Joi.string().min(3).lowercase().max(20).optional(),
-    category_id: Joi.string().min(3).lowercase().max(50).optional(),
+    marketplace_category_id: Joi.string().min(3).lowercase().max(50).optional(),
     description: Joi.string().lowercase().max(100).optional(),
-    photos: Joi.array().items(Joi.string()).optional(),
+    photos: Joi.array().items(Joi.string()).required(),
+    amount: Joi.number().optional(),
   }),
 };
 

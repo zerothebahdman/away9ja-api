@@ -14,30 +14,34 @@ datasource db {
 
 model User {
   // id                           Int       @id @default(autoincrement())
-  id                              String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id                              String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // id                String    @id @unique @default(uuid())
-  fullName                        String               @db.VarChar(255)
-  username                        String               @unique @db.VarChar(255)
-  email                           String               @unique @db.VarChar(255)
-  password                        String               @db.VarChar(255)
-  phoneNumber                     String               @db.VarChar(255)
+  fullName                        String                @db.VarChar(255)
+  username                        String                @unique @db.VarChar(255)
+  email                           String                @unique @db.VarChar(255)
+  password                        String                @db.VarChar(255)
+  phoneNumber                     String                @db.VarChar(255)
   gender                          Gender
-  role                            Role?                @default(user)
+  role                            Role?                 @default(user)
   maritalStatus                   MaritalStatus?
-  businessName                    String?              @db.VarChar(255)
-  address                         String               @db.VarChar(255)
-  stateOfOrigin                   String               @db.VarChar(255)
-  referralCode                    String?              @unique @db.VarChar(255)
-  inviteCode                      String?              @db.VarChar(255)
-  status                          AccountStatus?       @default(pending)
-  is_email_verified               Boolean?             @default(false)
+  pushNotificationId              String?               @db.VarChar(255)
+  businessName                    String?               @db.VarChar(255)
+  dob                             DateTime?
+  avatar                          String?               @db.VarChar(255)
+  address                         String                @db.VarChar(255)
+  stateOfOrigin                   String                @db.VarChar(255)
+  referralCode                    String?               @unique @db.VarChar(255)
+  inviteCode                      String?               @db.VarChar(255)
+  status                          AccountStatus?        @default(pending)
+  invitedUsersCount               Int?                  @default(0)
+  is_email_verified               Boolean?              @default(false)
   email_verified_at               DateTime?
-  email_verification_token        String?              @db.VarChar(255)
+  email_verification_token        String?               @db.VarChar(255)
   email_verification_token_expiry DateTime?
-  password_reset_token            String?              @unique @db.VarChar(255)
+  password_reset_token            String?               @unique @db.VarChar(255)
   password_reset_token_expires_at DateTime?
-  created_at                      DateTime             @default(now())
-  update_at                       DateTime?            @updatedAt
+  created_at                      DateTime              @default(now())
+  update_at                       DateTime?             @updatedAt
   deleted_at                      DateTime?
   posts                           Post[]
   post_comment                    PostComment[]
@@ -46,6 +50,7 @@ model User {
   Event                           Event[]
   marketPlaceComment              marketPlaceComment[]
   newbieCorner                    NewbieCorner[]
+  NotificationSettings            NotificationSettings?
 
   @@map("Users")
 }
@@ -85,20 +90,17 @@ model PostComment {
   deleted_at          DateTime?
   parent_post_comment ParentChildComment[] @relation("parent_post_comment")
   child_post_comment  ParentChildComment[] @relation("child_post_comment")
-  post_categories     PostCategories[]
 
   @@map("Post_Comments")
 }
 
 model PostCategories {
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String       @db.VarChar(255)
-  created_at      DateTime     @default(now())
-  update_at       DateTime?    @updatedAt
-  deleted_at      DateTime?
-  PostComment     PostComment? @relation(fields: [post_comment_id], references: [id])
-  post_comment_id String?      @db.Uuid
-  Post            Post[]
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String    @db.VarChar(255)
+  created_at DateTime  @default(now())
+  update_at  DateTime? @updatedAt
+  deleted_at DateTime?
+  Post       Post[]
 
   @@map("post_categories")
 }
@@ -154,7 +156,7 @@ model marketPlace {
   marketplace_category_id String?                @db.Uuid
   description             String?                @db.VarChar(255)
   photos                  String[]
-  amount                  Float                  @db.DoublePrecision
+  amount                  Float?                 @db.DoublePrecision
   created_at              DateTime               @default(now())
   updated_at              DateTime?              @updatedAt
   deleted_at              DateTime?
@@ -223,6 +225,22 @@ model NewbieTag {
 
   @@map("newbieTag")
 }
+ 
+model NotificationSettings {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user                 User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId               String?   @unique @db.Uuid
+  newbieCornerArticles Boolean   @default(false)
+  events               Boolean   @default(false)
+  marketPlace          Boolean   @default(false)
+  postFeed             Boolean   @default(false)
+  directMessages       Boolean   @default(false)
+  created_at           DateTime  @default(now())
+  updated_at           DateTime? @updatedAt
+  deleted_at           DateTime?
+
+  @@map("notification_settings")
+}
 
 enum Gender {
   male
@@ -255,4 +273,5 @@ enum AccountStatus {
 enum Role {
   admin
   user
+  exclusive_user
 }

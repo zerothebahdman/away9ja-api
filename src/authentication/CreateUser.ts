@@ -7,7 +7,7 @@ import prisma from '../database/model.module';
 import AuthService from '../services/Auth.service';
 import RESERVED_NAMES from '../utils/reservedNames';
 import HelperClass from '../utils/helper';
-import { AccountStatus } from '../../config/constants';
+import { AccountStatus, ROLE } from '../../config/constants';
 const emailService = new EmailService();
 
 export default class CreateUser {
@@ -48,6 +48,34 @@ export default class CreateUser {
             new AppException('Invalid referral code', httpStatus.BAD_REQUEST),
           );
         }
+
+        if (referrer.role === ROLE.USER && referrer.invitedUsersCount >= 5) {
+          return next(
+            new AppException(
+              'Referrer has reached the maximum number of referrals',
+              httpStatus.BAD_REQUEST,
+            ),
+          );
+        } else if (
+          referrer.role === ROLE.EXCLUSIVE_USER &&
+          referrer.invitedUsersCount >= 10
+        ) {
+          return next(
+            new AppException(
+              'Referrer has reached the maximum number of referrals',
+              httpStatus.BAD_REQUEST,
+            ),
+          );
+        }
+
+        await prisma.user.update({
+          where: { id: referrer.id },
+          data: {
+            invitedUsersCount: {
+              increment: 1,
+            },
+          },
+        });
       }
 
       /** if user does not exist create the user using the user service */

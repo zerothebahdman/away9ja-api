@@ -23,8 +23,6 @@ export const userController = new UserController(
   new EmailService(),
 );
 
-export const eventController = new EventController(new EventService());
-export const marketController = new MarketController(new MarketService());
 export const newbieCornerController = new NewbieCornerController(
   new NewbieCornerService(),
 );

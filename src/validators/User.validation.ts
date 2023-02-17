@@ -15,5 +15,17 @@ export const updateUserAccount = {
     gender: Joi.string().optional().valid('male', 'female'),
     address: Joi.string().optional().lowercase(),
     stateOfOrigin: Joi.string().optional().lowercase(),
+    avatar: Joi.string().optional(),
+    dob: Joi.date().optional(),
+  }),
+};
+
+export const userNotificationSettings = {
+  body: Joi.object().keys({
+    events: Joi.boolean().optional(),
+    newbieCornerArticles: Joi.boolean().optional(),
+    marketPlace: Joi.boolean().optional(),
+    postFeed: Joi.boolean().optional(),
+    directMessages: Joi.boolean().optional(),
   }),
 };

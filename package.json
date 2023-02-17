@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.8.1",
+    "@prisma/client": "^4.10.1",
     "@sentry/node": "^7.36.0",
     "@sentry/tracing": "^7.36.0",
     "@types/bcrypt": "^5.0.0",
@@ -43,6 +43,8 @@
     "express": "^4.17.3",
     "express-rate-limit": "^6.7.0",
     "express-sslify": "^1.2.0",
+    "fcm-node": "^1.6.1",
+    "firebase-admin": "^11.5.0",
     "helmet": "^6.0.0",
     "hpp": "^0.2.3",
     "http-status": "^1.5.3",
@@ -54,7 +56,7 @@
     "nodemailer": "^6.7.2",
     "pino": "^7.8.0",
     "pino-pretty": "^7.5.1",
-    "prisma": "^4.8.1",
+    "prisma": "^4.10.1",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.9.3"

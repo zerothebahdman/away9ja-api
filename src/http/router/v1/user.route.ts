@@ -6,6 +6,15 @@ import { updateUserAccount } from '../../../validators/User.validation';
 
 const route = Router();
 
+route
+  .route('/notification-settings')
+  .get(isUserAuthenticated, (req, res, next) => {
+    userController.getNotificationSettings(req, res, next);
+  })
+  .patch(isUserAuthenticated, (req, res, next) => {
+    userController.updateNotificationSettings(req, res, next);
+  });
+
 route.route('/account-status').get((req, res, next) => {
   userController.getAccountStatus(req, res, next);
 });

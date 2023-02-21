@@ -15,7 +15,7 @@
     "prisma:studio": "prisma studio --schema=./src/database/prisma/schema.prisma",
     "migrate:prod": "prisma migrate deploy --schema=./database/prisma/schema.prisma",
     "generate": "prisma generate --schema=./src/database/prisma/schema.prisma",
-    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm ./build/server.ts"
+    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm server.ts"
   },
   "keywords": [],
   "author": "",

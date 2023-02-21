@@ -1,5 +1,5 @@
 {
-  "name": "nodejs-boilerplate",
+  "name": "Away Naija",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -69,7 +69,7 @@
     "prettier": "^2.8.1"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
   }
 }

@@ -8,6 +8,7 @@ import EmailService from '../../services/Email.service';
 import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
 import RESERVED_NAMES from '../../utils/reservedNames';
+import { ROLE } from '../../../config/constants';
 
 export default class UserController {
   constructor(
@@ -171,6 +172,41 @@ export default class UserController {
       return res.status(httpStatus.OK).json({
         status: 'success',
         settings,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async validateReferralCode(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { referralCode } = req.body;
+      const user = await this.userService.getUser({ referralCode });
+      if (!user) throw new Error('Invalid referral code');
+      if (user.role === ROLE.USER && user.invitedUsersCount >= 5) {
+        return next(
+          new AppException(
+            'user has reached the maximum number of referrals',
+            httpStatus.BAD_REQUEST,
+          ),
+        );
+      } else if (
+        user.role === ROLE.EXCLUSIVE_USER &&
+        user.invitedUsersCount >= 10
+      ) {
+        return next(
+          new AppException(
+            'user has reached the maximum number of referrals',
+            httpStatus.BAD_REQUEST,
+          ),
+        );
+      }
+      return res.status(httpStatus.OK).json({
+        status: 'success',
+        canUseReferralCode: true,
+        message: 'Referral code can be used',
       });
     } catch (err: any) {
       return next(

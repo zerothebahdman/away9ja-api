@@ -246,7 +246,11 @@ export default class SocialController {
       const filter = pick(req.query, ['user_id', 'post_category_id']);
       Object.assign(filter, { isApproved: true });
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
-      const posts = await this.socialService.getAllPost(filter, options);
+      const posts = await this.socialService.getAllPost(
+        filter,
+        options,
+        req.user,
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         posts,

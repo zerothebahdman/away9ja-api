@@ -15,6 +15,7 @@ import sendNotificationToUser from '../utils/sendNotification';
 
 interface PostObj extends Post {
   user: User;
+  post_likes: PostLikes[];
 }
 export default class SocialService {
   constructor(private readonly userService: UserService) {}
@@ -26,6 +27,7 @@ export default class SocialService {
       limit?: string;
       populate?: string;
     } = {},
+    actor: User,
     ignorePagination = false,
   ): Promise<
     | Post[]
@@ -75,11 +77,20 @@ export default class SocialService {
           };
           Object.assign(post, { user });
         }
+        const hasActorLiked = post.post_likes.some(
+          (like) => like.user_id === actor.id,
+        );
+        await Promise.all(
+          post.post_likes.map(async (like) => {
+            const user = await this.userService.getUserById(like.user_id);
+            like.user_id = user as any;
+          }),
+        );
         const stats = {
           commentsCount: await this.getPostCommentsCount({ post_id: post.id }),
           likesCount: await this.getPostLikesCount({ post_id: post.id }),
         };
-        Object.assign(post, { stats });
+        Object.assign(post, { stats, hasActorLiked });
       }),
     );
     return newData;
@@ -216,6 +227,13 @@ export default class SocialService {
 
   async getPostCommentsCount(filter: Partial<PostComment>) {
     const data = await prisma.postComment.count({
+      where: { ...filter },
+    });
+    return data;
+  }
+
+  async getPostLikes(filter: Partial<PostLikes>) {
+    const data = await prisma.postLikes.findMany({
       where: { ...filter },
     });
     return data;

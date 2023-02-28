@@ -14,6 +14,7 @@ export enum MaritalStatus {
   MARRIED = 'married',
   DIVORCED = 'divorced',
   WIDOWED = 'widowed',
+  PREFER_NOT_TO_SAY = 'prefer_not_to_say',
 }
 
 export enum AccountStatus {

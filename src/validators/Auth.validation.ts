@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { MaritalStatus, AccountStatus, ROLE } from '../../config/constants';
 import { objectId } from './Custom.validator';
+import { Gender } from '@prisma/client';
 
 export const LoginValidator = {
   body: Joi.object().keys({
@@ -58,7 +59,9 @@ export const CreateUserValidator = {
         'string.required': 'Oops!, you have to specify a password',
       }),
     confirmPassword: Joi.ref('password'),
-    gender: Joi.string().required().valid('male', 'female'),
+    gender: Joi.string()
+      .required()
+      .valid(...Object.values(Gender)),
     address: Joi.string().required().lowercase(),
     stateOfOrigin: Joi.string().required().lowercase(),
     inviteCode: Joi.string().required(),

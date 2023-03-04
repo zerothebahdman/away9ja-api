@@ -365,18 +365,20 @@ export default class SocialController {
         totalPages: number;
         total: number;
       };
-      newData.results.forEach((post: PostObj) => {
-        if (post.isAnonymous === true) {
-          post.user_id = 'anonymous';
-          delete post?.user;
-          const user = {
-            username: `user${HelperClass.generateRandomChar(4, 'num')}`,
-            profile_image: null as null,
-            fullName: 'John Doe',
-          };
-          Object.assign(post, { user });
-        }
-      });
+      await Promise.all(
+        newData.results.map((post: PostObj) => {
+          if (post.isAnonymous === true) {
+            post.user_id = 'anonymous';
+            delete post?.user;
+            const user = {
+              username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+              profile_image: null as null,
+              fullName: 'John Doe',
+            };
+            Object.assign(post, { user });
+          }
+        }),
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         posts,

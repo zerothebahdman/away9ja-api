@@ -3,20 +3,13 @@ import {
   Post,
   ParentChildComment,
   PostComment,
-  User,
   PostLikes,
   PostCategories,
 } from '@prisma/client';
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
-import HelperClass from '../utils/helper';
 import UserService from './User.service';
 import sendNotificationToUser from '../utils/sendNotification';
-
-interface PostObj extends Post {
-  user: User;
-  post_likes: PostLikes[];
-}
 export default class SocialService {
   constructor(private readonly userService: UserService) {}
   async getAllPost(
@@ -27,7 +20,6 @@ export default class SocialService {
       limit?: string;
       populate?: string;
     } = {},
-    actor: User,
     ignorePagination = false,
   ): Promise<
     | Post[]
@@ -45,55 +37,8 @@ export default class SocialService {
 
     const data = ignorePagination
       ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
-      : ((await paginate<Post, typeof prisma.post>(
-          filter,
-          options,
-          prisma.post,
-        )) as {
-          results: Post[];
-          page: number;
-          limit: number;
-          totalPages: number;
-          total: number;
-        });
-    const newData = data as {
-      likesCount: number;
-      commentsCount: number;
-      results: PostObj[];
-      page: number;
-      limit: number;
-      totalPages: number;
-      total: number;
-    };
-    await Promise.all(
-      newData.results.map(async (post: PostObj) => {
-        if (post.isAnonymous === true) {
-          post.user_id = 'anonymous';
-          delete post?.user;
-          const user = {
-            username: `user${HelperClass.generateRandomChar(4, 'num')}`,
-            profile_image: null as null,
-            fullName: 'Anonymous',
-          };
-          Object.assign(post, { user });
-        }
-        const hasActorLiked = post.post_likes.some(
-          (like) => like.user_id === actor.id,
-        );
-        await Promise.all(
-          post.post_likes.map(async (like) => {
-            const user = await this.userService.getUserById(like.user_id);
-            like.user_id = user as any;
-          }),
-        );
-        const stats = {
-          commentsCount: await this.getPostCommentsCount({ post_id: post.id }),
-          likesCount: await this.getPostLikesCount({ post_id: post.id }),
-        };
-        Object.assign(post, { stats, hasActorLiked });
-      }),
-    );
-    return newData;
+      : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
+    return data;
   }
   async createPost(createBody: Post): Promise<Post> {
     const post: Post = await prisma.post.create({
@@ -265,29 +210,7 @@ export default class SocialService {
       ? await prisma.post.findMany({ where: { user_id: filter.user_id } })
       : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
 
-    const newData = data as {
-      likesCount: number;
-      commentsCount: number;
-      results: PostObj[];
-      page: number;
-      limit: number;
-      totalPages: number;
-      total: number;
-    };
-    newData.results.forEach((post: PostObj) => {
-      if (post.isAnonymous === true) {
-        post.user_id = 'anonymous';
-        delete post?.user;
-        const user = {
-          username: `user${HelperClass.generateRandomChar(4, 'num')}`,
-          profile_image: null as null,
-          fullName: 'Anonymous',
-        };
-        Object.assign(post, { user });
-      }
-    });
-
-    return newData;
+    return data;
   }
 
   async approveAnonymousPost(id: string): Promise<Post> {

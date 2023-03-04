@@ -20,7 +20,7 @@ export const LoginValidator = {
       'string.min': 'Oops!, password must be at least 8 characters long',
       'any.required': 'Oops!, you have to specify a password',
     }),
-    pushNotificationId: Joi.string().required(),
+    pushNotificationId: Joi.string().optional(),
   }),
 };
 

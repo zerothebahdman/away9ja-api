@@ -15,16 +15,19 @@ async function sendNotificationToUser(
   title: string,
   body: string,
 ) {
-  log.info(`Sending notification to ${deviceIds.length} devices`);
-  const message = {
-    //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-    tokens: deviceIds,
-    notification: {
-      title: title,
-      body: body,
-      sound: 'default',
-    },
-  };
-  return fcm.sendMulticast(message);
+  if (deviceIds.length !== 0) {
+    log.info(`Sending notification to ${deviceIds.length} devices`);
+    const message = {
+      //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+      tokens: deviceIds,
+      notification: {
+        title: title,
+        body: body,
+        sound: 'default',
+      },
+    };
+    return fcm.sendMulticast(message);
+  }
+  return null;
 }
 export default sendNotificationToUser;

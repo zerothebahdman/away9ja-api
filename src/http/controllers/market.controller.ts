@@ -74,6 +74,7 @@ export default class MarketController {
     try {
       const marketItem = await this.marketService.getMarketItemById(
         req.params.itemId,
+        req.query.populate as string,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

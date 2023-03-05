@@ -17,8 +17,32 @@ export default class MarketPlaceService {
     return marketPlaceItem;
   }
 
-  async getMarketItemById(id: string): Promise<marketPlace> {
-    const data = await prisma.marketPlace.findUnique({ where: { id } });
+  async getMarketItemById(
+    id: string,
+    eagerLoadFields: string,
+    eagerLoad = true,
+  ): Promise<marketPlace> {
+    let include: object = {};
+    if (eagerLoadFields) {
+      const populate: object[] = [];
+      eagerLoadFields.split(',').forEach((populateOption: string): void => {
+        const data = { [populateOption]: true };
+        populate.push(data);
+      });
+
+      // convert the array of populate objects to a single object
+      include = populate.reduce((acc: object, cur: object) => {
+        acc = { ...acc, ...cur };
+        return acc;
+      }, {});
+    }
+
+    const data = eagerLoad
+      ? await prisma.marketPlace.findUnique({
+          where: { id },
+          include: Object.keys(include).length > 0 ? { ...include } : undefined,
+        })
+      : await prisma.marketPlace.findUnique({ where: { id } });
     return data;
   }
 

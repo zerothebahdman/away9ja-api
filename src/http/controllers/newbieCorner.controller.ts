@@ -47,7 +47,32 @@ export default class NewbieCornerController {
     next: NextFunction,
   ) {
     try {
-      const newbieArticle = { user_id: req.user.id, ...req.body };
+      //convert list of ID from the request body to list of objects
+      function convertStringsToListOfObjects(
+        listOfStrings: string[],
+        keyName: string,
+      ): { [key: string]: string }[] {
+        const listOfObjects = listOfStrings.map((str: string) => {
+          const newObj: { [key: string]: string } = {};
+          newObj[keyName] = str;
+          return newObj;
+        });
+        return listOfObjects;
+      }
+
+      const listOfTag = convertStringsToListOfObjects(
+        req.body.newbieTag,
+        'name',
+      );
+
+      const newbieArticle = {
+        user_id: req.user.id,
+        ...req.body,
+        newbieTag: {
+          create: listOfTag,
+        },
+      };
+
       const newbieCornerArticle =
         await this.newbieCornerService.createNewbieArticle(newbieArticle);
       return res.status(httpStatus.ACCEPTED).json({

@@ -78,6 +78,7 @@ export default class TokenService {
       const _token = jwt.verify(token, PUBLIC_KEY, { algorithms: ['RS512'] });
       return _token;
     } catch (err: any) {
+      log.error(err);
       if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError')
         throw new Error(`Oops! your token has expired or is invalid`);
       throw new Error(err.message);

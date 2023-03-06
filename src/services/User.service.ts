@@ -29,7 +29,7 @@ export default class UserService {
   }
 
   async getUser(filter: Partial<User>): Promise<User> {
-    const data = await prisma.user.findFirst({ where: filter });
+    const data = await prisma.user.findFirst({ where: { ...filter } });
     return data;
   }
 

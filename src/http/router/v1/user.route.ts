@@ -6,6 +6,10 @@ import { updateUserAccount } from '../../../validators/User.validation';
 
 const route = Router();
 
+route.route('/validate-referral-code').post((req, res, next) => {
+  userController.validateReferralCode(req, res, next);
+});
+
 route
   .route('/notification-settings')
   .get(isUserAuthenticated, (req, res, next) => {

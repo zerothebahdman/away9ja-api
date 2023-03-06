@@ -35,8 +35,32 @@ export default class EventService {
     return data;
   }
 
-  async getEventById(id: string): Promise<Event> {
-    const data = await prisma.event.findUnique({ where: { id } });
+  async getEventById(
+    id: string,
+    eagerLoadFields: string,
+    eagerLoad = true,
+  ): Promise<Event> {
+    let include: object = {};
+    if (eagerLoadFields) {
+      const populate: object[] = [];
+      eagerLoadFields.split(',').forEach((populateOption: string): void => {
+        const data = { [populateOption]: true };
+        populate.push(data);
+      });
+
+      // convert the array of populate objects to a single object
+      include = populate.reduce((acc: object, cur: object) => {
+        acc = { ...acc, ...cur };
+        return acc;
+      }, {});
+    }
+
+    const data = eagerLoad
+      ? await prisma.event.findUnique({
+          where: { id },
+          include: Object.keys(include).length > 0 ? { ...include } : undefined,
+        })
+      : await prisma.event.findUnique({ where: { id } });
     return data;
   }
 

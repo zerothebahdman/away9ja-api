@@ -7,10 +7,20 @@ import httpStatus from 'http-status';
 import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
 import { CommentType } from '../../../config/constants';
-import { ParentChildComment, PostComment } from '@prisma/client';
+import {
+  ParentChildComment,
+  Post,
+  PostComment,
+  PostLikes,
+  User,
+} from '@prisma/client';
 import UserService from '../../services/User.service';
 import sendNotificationToUser from '../../utils/sendNotification';
 
+interface PostObj extends Post {
+  user: User;
+  post_likes: PostLikes[];
+}
 export default class SocialController {
   constructor(
     private readonly socialService: SocialService,
@@ -247,9 +257,50 @@ export default class SocialController {
       Object.assign(filter, { isApproved: true });
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const posts = await this.socialService.getAllPost(filter, options);
+      const newData = posts as {
+        likesCount: number;
+        commentsCount: number;
+        results: PostObj[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      };
+      await Promise.all(
+        newData.results.map(async (post: PostObj) => {
+          if (post.isAnonymous === true) {
+            post.user_id = 'anonymous';
+            delete post?.user;
+            const user = {
+              username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+              profile_image: null as null,
+              fullName: 'Anonymous',
+            };
+            Object.assign(post, { user });
+          }
+          const hasActorLiked = post.post_likes.some(
+            (like) => like.user_id === req.user.id,
+          );
+          await Promise.all(
+            post.post_likes.map(async (like) => {
+              const user = await this.userService.getUserById(like.user_id);
+              like.user_id = user as any;
+            }),
+          );
+          const stats = {
+            commentsCount: await this.socialService.getPostCommentsCount({
+              post_id: post.id,
+            }),
+            likesCount: await this.socialService.getPostLikesCount({
+              post_id: post.id,
+            }),
+          };
+          Object.assign(post, { stats, hasActorLiked });
+        }),
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
-        posts,
+        posts: newData,
       });
     } catch (err: any) {
       return next(
@@ -305,6 +356,29 @@ export default class SocialController {
       Object.assign(filter, { isAnonymous: true, isApproved: false });
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
       const posts = await this.socialService.getAnonymousPost(filter, options);
+      const newData = posts as {
+        likesCount: number;
+        commentsCount: number;
+        results: PostObj[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      };
+      await Promise.all(
+        newData.results.map((post: PostObj) => {
+          if (post.isAnonymous === true) {
+            post.user_id = 'anonymous';
+            delete post?.user;
+            const user = {
+              username: `user${HelperClass.generateRandomChar(4, 'num')}`,
+              profile_image: null as null,
+              fullName: 'John Doe',
+            };
+            Object.assign(post, { user });
+          }
+        }),
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         posts,

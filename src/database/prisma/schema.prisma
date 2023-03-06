@@ -200,6 +200,7 @@ model Event {
 }
 
 model NewbieCorner {
+
   id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   heading           String          @db.VarChar(255)
   body              String          @db.VarChar(1000)
@@ -211,11 +212,11 @@ model NewbieCorner {
   updated_at        DateTime?       @updatedAt
   deleted_at        DateTime?
 
-  
   @@map("NewbieCorner")
 }
 
 model NewbieTag {
+
   id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name            String       @db.VarChar(255)
   created_at      DateTime     @default(now())
@@ -223,18 +224,19 @@ model NewbieTag {
   deleted_at      DateTime?
   NewbieCorner    NewbieCorner[] 
 
+
   @@map("newbieTag")
 }
- 
+
 model NotificationSettings {
   id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user                 User?     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId               String?   @unique @db.Uuid
-  newbieCornerArticles Boolean   @default(false)
-  events               Boolean   @default(false)
-  marketPlace          Boolean   @default(false)
-  postFeed             Boolean   @default(false)
-  directMessages       Boolean   @default(false)
+  newbieCornerArticles Boolean   @default(true)
+  events               Boolean   @default(true)
+  marketPlace          Boolean   @default(true)
+  postFeed             Boolean   @default(true)
+  directMessages       Boolean   @default(true)
   created_at           DateTime  @default(now())
   updated_at           DateTime? @updatedAt
   deleted_at           DateTime?
@@ -245,6 +247,7 @@ model NotificationSettings {
 enum Gender {
   male
   female
+  prefer_not_to_say
 }
 
 enum PostType {
@@ -263,6 +266,7 @@ enum MaritalStatus {
   married
   divorced
   widowed
+  prefer_not_to_say
 }
 
 enum AccountStatus {

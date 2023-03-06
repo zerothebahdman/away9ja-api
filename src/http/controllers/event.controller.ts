@@ -42,7 +42,10 @@ export default class EventController {
 
   async getEvent(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const event = await this.eventService.getEventById(req.params.eventId);
+      const event = await this.eventService.getEventById(
+        req.params.eventId,
+        req.query.populate as string,
+      );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         event,

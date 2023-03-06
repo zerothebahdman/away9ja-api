@@ -5,6 +5,7 @@ import AppException from '../../exceptions/AppException';
 import NewbieCornerService from '../../services/NewbieCorner.service';
 import httpStatus from 'http-status';
 import pick from '../../utils/pick';
+import HelperClass from '../../utils/helper';
 
 export default class NewbieCornerController {
   constructor(private readonly newbieCornerService: NewbieCornerService) {}
@@ -48,19 +49,7 @@ export default class NewbieCornerController {
   ) {
     try {
       //convert list of ID from the request body to list of objects
-      function convertStringsToListOfObjects(
-        listOfStrings: string[],
-        keyName: string,
-      ): { [key: string]: string }[] {
-        const listOfObjects = listOfStrings.map((str: string) => {
-          const newObj: { [key: string]: string } = {};
-          newObj[keyName] = str;
-          return newObj;
-        });
-        return listOfObjects;
-      }
-
-      const listOfTag = convertStringsToListOfObjects(
+      const listOfTag = HelperClass.convertStringsToListOfObjects(
         req.body.newbieTag,
         'name',
       );

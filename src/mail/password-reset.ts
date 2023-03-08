@@ -1,4 +1,7 @@
-const PASSWORD_RESET = (fullName: string, url: string) => ` 
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+
+const PASSWORD_RESET = (fullName: string, url: string, email: string) => ` 
         <!DOCTYPE html>
         <html xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" lang="en">
 
@@ -304,7 +307,7 @@ const PASSWORD_RESET = (fullName: string, url: string) => `
                                                                 <tr>
                                                                     <td class="pad">
                                                                         <div style="color:#101112;direction:ltr;font-family:Arial, Helvetica, sans-serif;font-size:13px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:left;mso-line-height-alt:15.6px;">
-                                                                            <p style="margin: 0;">Copyright Away Naija, 2023, All rights reserved.</p>
+                                                                            <p style="margin: 0;">Copyright Away Naija, ${currentYear}, All rights reserved.</p>
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -313,7 +316,7 @@ const PASSWORD_RESET = (fullName: string, url: string) => `
                                                                 <tr>
                                                                     <td class="pad">
                                                                         <div style="color:#101112;direction:ltr;font-family:Arial, Helvetica, sans-serif;font-size:13px;font-weight:400;letter-spacing:0px;line-height:120%;text-align:center;mso-line-height-alt:15.6px;">
-                                                                            <p style="margin: 0;">The email was sent by Away Naija to deolade@gmail.com. It is intended for the individual or entity that it is addressed to, and may contain confidential information. If you are not the intended recipient, please contact us at howfar@awaynaija.com.</p>
+                                                                            <p style="margin: 0;">The email was sent by Away Naija to ${email}. It is intended for the individual or entity that it is addressed to, and may contain confidential information. If you are not the intended recipient, please contact us at howfar@awaynaija.com.</p>
                                                                         </div>
                                                                     </td>
                                                                 </tr>

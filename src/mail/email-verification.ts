@@ -1,4 +1,7 @@
-const EMAIL_VERIFICATION = (fullName: string, token: string) => `
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+
+const EMAIL_VERIFICATION = (fullName: string, token: string, email: string) => `
     <!DOCTYPE html>
     <html
       xmlns:v="urn:schemas-microsoft-com:vml"
@@ -1063,7 +1066,7 @@ const EMAIL_VERIFICATION = (fullName: string, token: string) => `
                                         "
                                       >
                                         <p style="margin: 0">
-                                          Copyright Away Naija, 2023, All rights
+                                          Copyright Away Naija, ${currentYear}, All rights
                                           reserved.
                                         </p>
                                       </div>
@@ -1100,7 +1103,7 @@ const EMAIL_VERIFICATION = (fullName: string, token: string) => `
                                       >
                                         <p style="margin: 0">
                                           The email was sent by Away Naija to
-                                          deolade@gmail.com. It is intended for the
+                                          ${email}. It is intended for the
                                           individual or entity that it is addressed
                                           to, and may contain confidential
                                           information. If you are not the intended

@@ -1,5 +1,8 @@
 //import config from '../../config/default';
-const USER_INVITATION = (fullName: string, code: string) => `
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+
+const USER_INVITATION = (fullName: string, code: string, email: string) => `
         <!DOCTYPE html>
         <html
         xmlns:v="urn:schemas-microsoft-com:vml"
@@ -1171,7 +1174,7 @@ const USER_INVITATION = (fullName: string, code: string) => `
                                             "
                                         >
                                             <p style="margin: 0">
-                                            Copyright Away Naija, 2023, All rights
+                                            Copyright Away Naija, ${currentYear}, All rights
                                             reserved.
                                             </p>
                                         </div>
@@ -1208,7 +1211,7 @@ const USER_INVITATION = (fullName: string, code: string) => `
                                         >
                                             <p style="margin: 0">
                                             The email was sent by Away Naija to
-                                            deolade@gmail.com. It is intended for the
+                                            ${email}. It is intended for the
                                             individual or entity that it is addressed
                                             to, and may contain confidential
                                             information. If you are not the intended

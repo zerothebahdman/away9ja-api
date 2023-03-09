@@ -15,5 +15,6 @@ export const createNewbieArticleValidator = {
     }),
     body: Joi.string().min(3).lowercase().max(1000),
     newbieTag_id: Joi.string().min(3).lowercase(),
+    article_position: Joi.number().integer().required(),
   }),
 };

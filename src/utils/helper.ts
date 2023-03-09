@@ -62,4 +62,16 @@ export default class HelperClass {
     }
     return newObject;
   }
+
+  static convertStringsToListOfObjects(
+    listOfStrings: string[],
+    keyName: string,
+  ): { [key: string]: string }[] {
+    const listOfObjects = listOfStrings.map((str: string) => {
+      const newObj: { [key: string]: string } = {};
+      newObj[keyName] = str;
+      return newObj;
+    });
+    return listOfObjects;
+  }
 }

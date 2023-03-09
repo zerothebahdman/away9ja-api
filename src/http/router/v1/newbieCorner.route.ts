@@ -4,7 +4,7 @@ import { isUserAuthenticated } from '../../middlewares/auth.middleware';
 import validate from '../../middlewares/validate';
 import {
   newbieTagValidator,
-  createNewbieArticleValidator,
+  //createNewbieArticleValidator,
 } from '../../../validators/newbieCorner.validator';
 
 const route = Router();
@@ -28,7 +28,7 @@ route.get(
 route.post(
   '/create-newbie-article',
   isUserAuthenticated,
-  validate(createNewbieArticleValidator),
+  //validate(createNewbieArticleValidator),
   (req: Request, res: Response, next: NextFunction) => {
     newbieCornerController.createNewbieArticle(req, res, next);
   },

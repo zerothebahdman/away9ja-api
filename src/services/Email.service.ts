@@ -51,23 +51,30 @@ export default class EmailService {
     if (!subject || !templatePath) return;
     switch (templatePath) {
       case 'welcome':
-        mailOptions.html = WELCOME_EMAIL(data.fullName, data.url);
+        mailOptions.html = WELCOME_EMAIL(data.fullName, data.url, email);
         mailOptions.subject = `${subject} ${data.fullName}`;
         break;
       case 'password-reset':
-        mailOptions.html = PASSWORD_RESET_EMAIL(data.fullName, data.token);
+        mailOptions.html = PASSWORD_RESET_EMAIL(
+          data.fullName,
+          data.token,
+          email,
+        );
         mailOptions.subject = `[${config.appName}] - ${subject}`;
         break;
       case 'email-verification':
-        mailOptions.html = EMAIL_VERIFICATION(data.fullName, data.token);
+        mailOptions.html = EMAIL_VERIFICATION(data.fullName, data.token, email);
         mailOptions.subject = `[${config.appName}] ${subject}`;
         break;
       case 'account-verified':
-        mailOptions.html = USER_ACCOUNT_VERIFIED_BY_REFERRER(data.fullName);
+        mailOptions.html = USER_ACCOUNT_VERIFIED_BY_REFERRER(
+          data.fullName,
+          email,
+        );
         mailOptions.subject = `[${config.appName}] ${subject}`;
         break;
       case 'user-invitation':
-        mailOptions.html = USER_INVITATION(data.fullName, data.code);
+        mailOptions.html = USER_INVITATION(data.fullName, data.code, email);
         mailOptions.subject = `${subject} ${config.appName}`;
         break;
     }

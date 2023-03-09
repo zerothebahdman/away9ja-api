@@ -196,6 +196,9 @@ export default class MarketPlaceService {
       where: {
         ...filter,
       },
+      include: {
+        user: true,
+      },
     });
     return data;
   }
@@ -212,6 +215,9 @@ export default class MarketPlaceService {
     const data = await prisma.marketPlaceComment.findMany({
       where: {
         ...filter,
+      },
+      include: {
+        user: true,
       },
     });
     return data;
@@ -230,6 +236,9 @@ export default class MarketPlaceService {
   async getMArketPlaceCommentById(id: string) {
     const data = await prisma.marketPlaceComment.findUnique({
       where: { id },
+      include: {
+        user: true,
+      },
     });
     return data;
   }

@@ -5,6 +5,7 @@ import AppException from '../../exceptions/AppException';
 import NewbieCornerService from '../../services/NewbieCorner.service';
 import httpStatus from 'http-status';
 import pick from '../../utils/pick';
+import HelperClass from '../../utils/helper';
 
 export default class NewbieCornerController {
   constructor(private readonly newbieCornerService: NewbieCornerService) {}
@@ -47,7 +48,20 @@ export default class NewbieCornerController {
     next: NextFunction,
   ) {
     try {
-      const newbieArticle = { user_id: req.user.id, ...req.body };
+      //convert list of ID from the request body to list of objects
+      const listOfTag = HelperClass.convertStringsToListOfObjects(
+        req.body.newbieTag,
+        'name',
+      );
+
+      const newbieArticle = {
+        user_id: req.user.id,
+        ...req.body,
+        newbieTag: {
+          create: listOfTag,
+        },
+      };
+
       const newbieCornerArticle =
         await this.newbieCornerService.createNewbieArticle(newbieArticle);
       return res.status(httpStatus.ACCEPTED).json({

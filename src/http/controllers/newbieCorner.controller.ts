@@ -120,4 +120,45 @@ export default class NewbieCornerController {
       );
     }
   }
+  async editNewbieArticle(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const newbieArticle = {
+        user_id: req.user.id,
+        ...req.body,
+      };
+      const newArticle = await this.newbieCornerService.updateNewbieArticleById(
+        req.params.articleId,
+        newbieArticle,
+      );
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: 'Your article has been updated',
+        newArticle,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+  async deleteArticle(
+    req: RequestType,
+    res: Response,
+    next: NextFunction,
+  ): Promise<void | Response<any, Record<string, any>>> {
+    try {
+      const article = await this.newbieCornerService.deleteNewbieArticleById(
+        req.params.articleId,
+      );
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: 'This article has been deleted',
+        article,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

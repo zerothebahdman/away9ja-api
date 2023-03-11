@@ -109,4 +109,20 @@ export default class NewbieCornerService {
         );
     return data;
   }
+  async updateNewbieArticleById(
+    id: string,
+    updateBody: NewbieCorner,
+  ): Promise<NewbieCorner> {
+    const newbieCornerArticle = await prisma.newbieCorner.update({
+      where: { id },
+      data: { ...updateBody },
+      include: { newbieTag: true },
+    });
+    return newbieCornerArticle;
+  }
+  async deleteNewbieArticleById(id: string) {
+    await prisma.newbieCorner.delete({
+      where: { id },
+    });
+  }
 }

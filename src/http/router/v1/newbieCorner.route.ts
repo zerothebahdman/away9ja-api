@@ -50,4 +50,20 @@ route.get(
   },
 );
 
+route.patch(
+  '/edit-article/:articleId',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    newbieCornerController.editNewbieArticle(req, res, next);
+  },
+);
+
+route.delete(
+  '/delete-article/:articleId',
+  isUserAuthenticated,
+  (req: Request, res: Response, next: NextFunction) => {
+    newbieCornerController.deleteArticle(req, res, next);
+  },
+);
+
 export default route;

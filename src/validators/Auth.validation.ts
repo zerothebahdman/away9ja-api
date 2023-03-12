@@ -66,6 +66,7 @@ export const CreateUserValidator = {
     stateOfOrigin: Joi.string().required().lowercase(),
     inviteCode: Joi.string().required(),
     role: Joi.string().valid(...Object.values(ROLE)),
+    avatar: Joi.string().optional(),
   }),
 };
 

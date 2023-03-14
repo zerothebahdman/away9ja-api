@@ -203,7 +203,7 @@ model NewbieCorner {
 
   id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   heading           String          @db.VarChar(255)
-  body              String          @db.VarChar(1000)
+  body              String          @db.VarChar(2000)
   user              User?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
   user_id           String?         @db.Uuid
   newbieTag         NewbieTag[]     

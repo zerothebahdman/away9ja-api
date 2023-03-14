@@ -3,8 +3,9 @@ import { newbieCornerController } from '../../controllers/controllers.module';
 import { isUserAuthenticated } from '../../middlewares/auth.middleware';
 import validate from '../../middlewares/validate';
 import {
+  editNewbieArticleValidator,
   newbieTagValidator,
-  //createNewbieArticleValidator,
+  createNewbieArticleValidator,
 } from '../../../validators/newbieCorner.validator';
 
 const route = Router();
@@ -28,7 +29,7 @@ route.get(
 route.post(
   '/create-newbie-article',
   isUserAuthenticated,
-  //validate(createNewbieArticleValidator),
+  validate(createNewbieArticleValidator),
   (req: Request, res: Response, next: NextFunction) => {
     newbieCornerController.createNewbieArticle(req, res, next);
   },
@@ -53,6 +54,7 @@ route.get(
 route.patch(
   '/edit-article/:articleId',
   isUserAuthenticated,
+  validate(editNewbieArticleValidator),
   (req: Request, res: Response, next: NextFunction) => {
     newbieCornerController.editNewbieArticle(req, res, next);
   },

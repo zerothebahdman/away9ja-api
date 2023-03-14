@@ -45,6 +45,7 @@ export default class NewbieCornerService {
   async createNewbieArticle(createBody: NewbieCorner): Promise<NewbieCorner> {
     const newbieCornerArticle: NewbieCorner = await prisma.newbieCorner.create({
       data: { ...createBody },
+      include: { newbieTag: true },
     });
     return newbieCornerArticle;
   }
@@ -108,5 +109,33 @@ export default class NewbieCornerService {
           prisma.newbieCorner,
         );
     return data;
+  }
+  async updateNewbieArticleById(
+    id: string,
+    updateBody: Partial<NewbieCorner & NewbieTag>,
+  ): Promise<NewbieCorner> {
+    if (updateBody.name) {
+      const newbieCornerArticle: NewbieCorner =
+        await prisma.newbieCorner.update({
+          where: { id },
+          data: {
+            ...updateBody,
+          },
+          include: { newbieTag: true },
+        });
+      return newbieCornerArticle;
+    } else {
+      const newbieCornerArticle = await prisma.newbieCorner.update({
+        where: { id },
+        data: { ...updateBody },
+        include: { newbieTag: true },
+      });
+      return newbieCornerArticle;
+    }
+  }
+  async deleteNewbieArticleById(id: string) {
+    await prisma.newbieCorner.delete({
+      where: { id },
+    });
   }
 }

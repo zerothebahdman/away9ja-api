@@ -28,7 +28,7 @@ export const CreateUserValidator = {
   body: Joi.object().keys({
     fullName: Joi.string().min(3).lowercase().max(40).required(),
     username: Joi.string().min(3).lowercase().max(40).required(),
-    businessName: Joi.string().min(3).lowercase().max(40).required(),
+    businessName: Joi.string().min(3).lowercase().max(40).optional(),
     maritalStatus: Joi.string()
       .valid(...Object.values(MaritalStatus))
       .required(),

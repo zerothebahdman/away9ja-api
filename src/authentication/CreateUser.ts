@@ -40,7 +40,7 @@ export default class CreateUser {
       if (req.body.role !== 'admin') {
         /** Save the referral and referrer details */
         const referrer = await prisma.user.findUnique({
-          where: { referralCode: req.body.inviteCode },
+          where: { referralCode: req.body.inviteCode.toUpperCase() },
         });
 
         if (!referrer) {
@@ -90,7 +90,7 @@ export default class CreateUser {
 
       return res.status(httpStatus.OK).json({
         status: 'success',
-        message: `We've sent an verification email to your mail`,
+        message: `We've sent an email verification to your mail`,
         user,
       });
     } catch (err: any) {

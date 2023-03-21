@@ -90,7 +90,7 @@ export default class CreateUser {
 
       return res.status(httpStatus.OK).json({
         status: 'success',
-        message: `We've sent an verification email to your mail`,
+        message: `We've sent an email verification to your mail`,
         user,
       });
     } catch (err: any) {

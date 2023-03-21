@@ -40,7 +40,7 @@ export default class CreateUser {
       if (req.body.role !== 'admin') {
         /** Save the referral and referrer details */
         const referrer = await prisma.user.findUnique({
-          where: { referralCode: req.body.inviteCode },
+          where: { referralCode: req.body.inviteCode.toUpperCase() },
         });
 
         if (!referrer) {

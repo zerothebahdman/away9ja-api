@@ -28,6 +28,7 @@ export default class CreateUser {
 
       // check that the username is in the right format
       HelperClass.userNameValidator(req.body.username);
+      req.body.fullName = HelperClass.titleCase(req.body.fullName);
 
       // Reserved usernames
       if (RESERVED_NAMES.includes(req.body.username))

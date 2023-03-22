@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 export const newbieTagValidator = {
   body: Joi.object().keys({
-    name: Joi.string().lowercase().max(50).required().messages({
+    name: Joi.string().max(50).required().messages({
       'string.max': 'You have exceeded more than 50 characters',
     }),
   }),
@@ -10,10 +10,10 @@ export const newbieTagValidator = {
 
 export const createNewbieArticleValidator = {
   body: Joi.object().keys({
-    heading: Joi.string().lowercase().max(50).required().messages({
+    heading: Joi.string().max(50).required().messages({
       'string.max': 'You have exceeded more than 50 characters',
     }),
-    body: Joi.string().min(3).lowercase().max(1000),
+    body: Joi.string().min(3).max(1000),
     newbieTag: Joi.array().items(Joi.string().lowercase()).required(),
     article_position: Joi.number().integer().required(),
   }),
@@ -21,10 +21,10 @@ export const createNewbieArticleValidator = {
 
 export const editNewbieArticleValidator = {
   body: Joi.object().keys({
-    heading: Joi.string().lowercase().max(50).optional().messages({
+    heading: Joi.string().max(50).optional().messages({
       'string.max': 'You have exceeded more than 50 characters',
     }),
-    body: Joi.string().min(3).lowercase().max(1000).optional(),
+    body: Joi.string().min(3).max(1000).optional(),
     newbieTag: Joi.array().items(Joi.string().lowercase()).optional(),
     article_position: Joi.number().integer().optional(),
   }),

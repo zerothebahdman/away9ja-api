@@ -26,9 +26,9 @@ export const LoginValidator = {
 
 export const CreateUserValidator = {
   body: Joi.object().keys({
-    fullName: Joi.string().min(3).lowercase().max(40).required(),
+    fullName: Joi.string().min(3).max(40).required(),
     username: Joi.string().min(3).lowercase().max(40).required(),
-    businessName: Joi.string().min(3).lowercase().max(40).optional(),
+    businessName: Joi.string().min(3).max(40).optional(),
     maritalStatus: Joi.string()
       .valid(...Object.values(MaritalStatus))
       .required(),
@@ -62,8 +62,8 @@ export const CreateUserValidator = {
     gender: Joi.string()
       .required()
       .valid(...Object.values(Gender)),
-    address: Joi.string().required().lowercase(),
-    stateOfOrigin: Joi.string().required().lowercase(),
+    address: Joi.string().required(),
+    stateOfOrigin: Joi.string().required(),
     inviteCode: Joi.string().required(),
     role: Joi.string().valid(...Object.values(ROLE)),
     avatar: Joi.string().optional(),

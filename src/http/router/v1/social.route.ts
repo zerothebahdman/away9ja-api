@@ -5,13 +5,11 @@ import validate from '../../middlewares/validate';
 import {
   CreatePostValidator,
   CreateCommentValidator,
+  reportPost,
 } from '../../../validators/SocialPost.validator';
 import { restrictAccessTo } from '../../middlewares/role.middleware';
 import { ROLE } from '../../../../config/constants';
-import {
-  addCategoryValidator,
-  reportPost,
-} from '../../../validators/marketPlace.validator';
+import { addCategoryValidator } from '../../../validators/marketPlace.validator';
 
 const route = Router();
 

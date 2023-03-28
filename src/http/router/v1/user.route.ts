@@ -40,4 +40,8 @@ route.route('/invite').post(isUserAuthenticated, (req, res, next) => {
   userController.inviteUser(req, res, next);
 });
 
+route.route('/delete-me').delete(isUserAuthenticated, (req, res, next) => {
+  userController.deleteMe(req, res, next);
+});
+
 export default route;

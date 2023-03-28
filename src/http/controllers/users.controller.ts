@@ -214,4 +214,18 @@ export default class UserController {
       );
     }
   }
+
+  async deleteMe(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      await this.userService.deleteUserById(req.user.id);
+      return res.status(httpStatus.NO_CONTENT).json({
+        status: 'success',
+        message: 'User deleted successfully',
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

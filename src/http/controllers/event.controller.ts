@@ -8,6 +8,7 @@ import { RequestType } from '../middlewares/auth.middleware';
 import moment from 'moment';
 import UserService from '../../services/User.service';
 import sendNotificationToUser from '../../utils/sendNotification';
+import { Event } from '@prisma/client';
 
 export default class EventController {
   constructor(
@@ -26,6 +27,24 @@ export default class EventController {
           'orderBy',
         ]);
         const events = await this.eventService.getEvents(filter, options);
+        const newData = events as {
+          results: Event[];
+          page: number;
+          limit: number;
+          totalPages: number;
+          total: number;
+        };
+
+        // sort based on the date that's closer to the current date
+        newData.results.sort((a: any, b: any) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          const now = new Date();
+          const diffA = Math.abs(dateA.getTime() - now.getTime());
+          const diffB = Math.abs(dateB.getTime() - now.getTime());
+          return diffA - diffB;
+        });
+
         return res.status(httpStatus.ACCEPTED).json({
           status: 'success',
           events,

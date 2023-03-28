@@ -8,9 +8,29 @@ import {
 } from '../../../validators/SocialPost.validator';
 import { restrictAccessTo } from '../../middlewares/role.middleware';
 import { ROLE } from '../../../../config/constants';
-import { addCategoryValidator } from '../../../validators/marketPlace.validator';
+import {
+  addCategoryValidator,
+  reportPost,
+} from '../../../validators/marketPlace.validator';
 
 const route = Router();
+
+route
+  .route('/flag-post')
+  .post(
+    isUserAuthenticated,
+    validate(reportPost),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.flagPost(req, res, next);
+    },
+  )
+  .get(
+    isUserAuthenticated,
+    restrictAccessTo(ROLE.ADMIN),
+    (req: Request, res: Response, next: NextFunction) => {
+      socialController.getFlaggedPost(req, res, next);
+    },
+  );
 
 route.post(
   '/create-post',

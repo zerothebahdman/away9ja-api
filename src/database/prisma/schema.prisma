@@ -51,6 +51,8 @@ model User {
   marketPlaceComment              marketPlaceComment[]
   newbieCorner                    NewbieCorner[]
   NotificationSettings            NotificationSettings?
+  ParentChildComment              ParentChildComment[]
+  ReportPost                      ReportPost[]
 
   @@map("Users")
 }
@@ -67,14 +69,32 @@ model Post {
   tags             String[]
   location         String?
   isApproved       Boolean?        @default(false)
+  isPostFlagged    Boolean?        @default(false)
   isAnonymous      Boolean?        @default(false)
   created_at       DateTime        @default(now())
   update_at        DateTime?       @updatedAt
   deleted_at       DateTime?
   post_comment     PostComment[]
   post_likes       PostLikes[]
+  ReportPost       ReportPost[]
 
   @@map("Posts")
+}
+
+model ReportPost {
+  id          String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user        User?          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id     String?        @db.Uuid
+  post        Post?          @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  post_id     String?        @db.Uuid
+  reason      String?        @db.VarChar(255)
+  description String?        @db.VarChar()
+  status      FlaggedStatus? @default(pending)
+  created_at  DateTime       @default(now())
+  update_at   DateTime?      @updatedAt
+  deleted_at  DateTime?
+
+  @@map("report_posts")
 }
 
 model PostComment {
@@ -131,6 +151,8 @@ model ParentChildComment {
   parent_market_place_comment_id String?             @db.Uuid
   child_market_place_comment     marketPlaceComment? @relation(fields: [child_market_place_comment_id], "child_market_place_comment", references: [id], onDelete: Cascade, onUpdate: Cascade)
   child_market_place_comment_id  String?             @db.Uuid
+  User                           User?               @relation(fields: [userId], references: [id])
+  userId                         String?             @db.Uuid
 
   @@map("parent_child_comments")
 }
@@ -200,30 +222,27 @@ model Event {
 }
 
 model NewbieCorner {
-
-  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  heading           String          @db.VarChar(255)
-  body              String          @db.VarChar(2000)
-  user              User?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id           String?         @db.Uuid
-  newbieTag         NewbieTag[]     
-  article_position  Int?            @unique
-  created_at        DateTime        @default(now())
-  updated_at        DateTime?       @updatedAt
-  deleted_at        DateTime?
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  heading          String      @db.VarChar(255)
+  body             String      @db.VarChar(2000)
+  user             User?       @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id          String?     @db.Uuid
+  newbieTag        NewbieTag[]
+  article_position Int?        @unique
+  created_at       DateTime    @default(now())
+  updated_at       DateTime?   @updatedAt
+  deleted_at       DateTime?
 
   @@map("NewbieCorner")
 }
 
 model NewbieTag {
-
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name            String       @db.VarChar(255)
-  created_at      DateTime     @default(now())
-  update_at       DateTime?    @updatedAt
-  deleted_at      DateTime?
-  NewbieCorner    NewbieCorner[] 
-
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String         @db.VarChar(255)
+  created_at   DateTime       @default(now())
+  update_at    DateTime?      @updatedAt
+  deleted_at   DateTime?
+  NewbieCorner NewbieCorner[]
 
   @@map("newbieTag")
 }
@@ -278,4 +297,10 @@ enum Role {
   admin
   user
   exclusive_user
+}
+
+enum FlaggedStatus {
+  pending
+  resolved
+  rejected
 }

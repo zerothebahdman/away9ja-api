@@ -463,4 +463,35 @@ export default class SocialController {
       );
     }
   }
+
+  async flagPost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      req.body.user_id = req.user.id;
+      await this.socialService.flagPost(req.body);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        message: `Thanks for flagging this post`,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
+
+  async getFlaggedPost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      const filter = pick(req.query, ['user_id']);
+      const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
+      const posts = await this.socialService.getFlaggedPost(filter, options);
+      return res.status(httpStatus.ACCEPTED).json({
+        status: 'success',
+        posts,
+      });
+    } catch (err: any) {
+      return next(
+        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
+      );
+    }
+  }
 }

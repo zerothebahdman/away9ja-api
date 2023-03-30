@@ -6,7 +6,7 @@ import { User } from '@prisma/client';
 import UserService from '../services/User.service';
 import EncryptionService from '../services/Encryption.service';
 import HelperClass from '../utils/helper';
-import { AccountStatus } from '../../config/constants';
+import { AccountStatus, ROLE } from '../../config/constants';
 
 export default class LoginUser {
   constructor(
@@ -38,8 +38,9 @@ export default class LoginUser {
         );
 
       // check if the person that referred the user has approved the request
-      if (_userExists.status !== AccountStatus.VERIFIED)
-        next(new AppException(`Oops!, your referrer has to verify you`, 403));
+      if (_userExists.role !== ROLE.ADMIN)
+        if (_userExists.status !== AccountStatus.VERIFIED)
+          next(new AppException(`Oops!, your referrer has to verify you`, 403));
 
       const token = await this.authService.loginUser(_userExists);
       await this.userService.updateUserById(_userExists.id, {

@@ -27,3 +27,11 @@ export const CreateCommentValidator = {
     }),
   }),
 };
+
+export const reportPost = {
+  body: Joi.object().keys({
+    post_id: Joi.custom(objectId).required(),
+    reason: Joi.string().required(),
+    description: Joi.string().required(),
+  }),
+};

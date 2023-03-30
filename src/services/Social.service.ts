@@ -5,6 +5,7 @@ import {
   PostComment,
   PostLikes,
   PostCategories,
+  ReportPost,
 } from '@prisma/client';
 import paginate from '../utils/paginate';
 import { CommentType } from '../../config/constants';
@@ -32,7 +33,7 @@ export default class SocialService {
       }
   > {
     if (typeof filter === 'object' && filter !== null) {
-      Object.assign(filter, { deleted_at: null });
+      Object.assign(filter, { deleted_at: null, isPostFlagged: false });
     }
 
     const data = ignorePagination
@@ -264,6 +265,57 @@ export default class SocialService {
           filter,
           options,
           prisma.postCategories,
+        );
+    return data;
+  }
+
+  async flagPost(data: Partial<ReportPost>): Promise<{ message: string }> {
+    const { user_id, post_id, reason, description } = data;
+    const flag = await prisma.reportPost.findFirst({
+      where: { user_id, post_id },
+    });
+
+    if (flag) {
+      await prisma.reportPost.delete({
+        where: { id: flag.id },
+      });
+      return { message: 'Post unflagged' };
+    }
+    await prisma.reportPost.create({
+      data: { user_id, post_id, reason, description },
+    });
+    return { message: 'Post flagged' };
+  }
+
+  async getFlaggedPost(
+    filter: Partial<ReportPost>,
+    options: {
+      orderBy?: string;
+      page?: string;
+      limit?: string;
+      populate?: string;
+    } = {},
+    ignorePagination = false,
+  ): Promise<
+    | ReportPost[]
+    | {
+        results: ReportPost[];
+        page: number;
+        limit: number;
+        totalPages: number;
+        total: number;
+      }
+  > {
+    if (typeof filter === 'object' && filter !== null) {
+      Object.assign(filter, { deleted_at: null });
+    }
+
+    const data = ignorePagination
+      ? await prisma.reportPost.findMany({ where: filter })
+      : await paginate<ReportPost, typeof prisma.reportPost>(
+          filter,
+          options,
+          prisma.reportPost,
         );
     return data;
   }

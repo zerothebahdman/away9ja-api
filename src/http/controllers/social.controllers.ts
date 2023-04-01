@@ -53,7 +53,7 @@ export default class SocialController {
       await Promise.all(promise);
       await sendNotificationToUser(
         pushNotificationId,
-        `Updated article feed`,
+        `New Post`,
         `${req.user.fullName} just posted an article`,
       );
       return res.status(httpStatus.ACCEPTED).json({

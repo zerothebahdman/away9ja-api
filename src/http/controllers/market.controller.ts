@@ -40,7 +40,7 @@ export default class MarketController {
       await sendNotificationToUser(
         pushNotificationId,
         `Freebies`,
-        `New freebies from ${req.user.fullName}`,
+        `Hey, new freebies from ${req.user.fullName} 🥳`,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

@@ -31,6 +31,7 @@ const envVarsSchema = Joi.object()
     ENABLE_SENTRY_LOGGING: Joi.bool()
       .default(false)
       .description('Enable Sentry Logging'),
+    EXPO_ACCESS_TOKEN: Joi.string().description('Expo Access Token'),
   })
   .unknown();
 const { value: envVars, error } = envVarsSchema
@@ -57,6 +58,7 @@ export default {
   MAIL_PORT: envVars.MAIL_PORT,
   concurrency: parseInt(envVars.QUEUE_CONCURRENCY || '1'),
   emailQueueName: envVars.QUEUE_NAME || 'agsaap',
+  expoAccessToken: envVars.EXPO_ACCESS_TOKEN,
   connection: {
     host: envVars.REDIS_HOST,
     port: parseInt(envVars.REDIS_PORT || '6379'),

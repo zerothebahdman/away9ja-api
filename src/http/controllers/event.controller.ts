@@ -101,7 +101,7 @@ export default class EventController {
       await sendNotificationToUser(
         pushNotificationId,
         `New Event`,
-        `New Event has been created`,
+        `Hey, a new event was just added 🥳`,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

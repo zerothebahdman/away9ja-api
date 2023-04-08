@@ -64,7 +64,7 @@ export const CreateUserValidator = {
       .valid(...Object.values(Gender)),
     address: Joi.string().required(),
     stateOfOrigin: Joi.string().required(),
-    inviteCode: Joi.string().required(),
+    inviteCode: Joi.string().required().trim(),
     role: Joi.string().valid(...Object.values(ROLE)),
     avatar: Joi.string().optional(),
   }),

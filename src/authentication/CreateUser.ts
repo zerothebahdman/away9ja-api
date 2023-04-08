@@ -37,11 +37,11 @@ export default class CreateUser {
       req.body.referralCode = HelperClass.generateRandomChar(6, 'upper-num');
 
       req.body.status = AccountStatus.PENDING;
-
       if (req.body.role !== 'admin') {
+        req.body.inviteCode = req.body.inviteCode.toUpperCase();
         /** Save the referral and referrer details */
         const referrer = await prisma.user.findUnique({
-          where: { referralCode: req.body.inviteCode.toUpperCase() },
+          where: { referralCode: req.body.inviteCode },
         });
 
         if (!referrer) {

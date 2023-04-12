@@ -47,6 +47,18 @@ export default class LoginUser {
         pushNotificationId: req.body.pushNotificationId,
       });
 
+      const userNotificationSaved =
+        await this.userService.getNotificationSettings(_userExists.id);
+      if (!userNotificationSaved) {
+        await this.userService.updateNotificationSettings(_userExists.id, {
+          marketPlace: true,
+          directMessages: true,
+          events: true,
+          newbieCornerArticles: true,
+          postFeed: true,
+        });
+      }
+
       return res.status(httpStatus.ACCEPTED).json({
         user: HelperClass.removeUnwantedProperties(_userExists, [
           'email_verified_at',
@@ -59,10 +71,10 @@ export default class LoginUser {
         ]),
         token,
       });
-    } catch (err: any) {
-      return next(
-        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
-      );
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return next(new AppException(err.message, httpStatus.BAD_REQUEST));
+      }
     }
   }
 
@@ -80,10 +92,10 @@ export default class LoginUser {
         );
 
       return res.status(httpStatus.OK).json({ status: 'success', accessToken });
-    } catch (err: any) {
-      return next(
-        new AppException(err.message, err.status || httpStatus.BAD_REQUEST),
-      );
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return next(new AppException(err.message, httpStatus.BAD_REQUEST));
+      }
     }
   }
 
@@ -99,10 +111,10 @@ export default class LoginUser {
 
       await this.authService.resendOtp(_user);
       return res.status(httpStatus.NO_CONTENT).send();
-    } catch (err: any) {
-      return next(
-        new AppException(err.status, err.message || httpStatus.FORBIDDEN),
-      );
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        return next(new AppException(err.message, httpStatus.BAD_REQUEST));
+      }
     }
   }
 }

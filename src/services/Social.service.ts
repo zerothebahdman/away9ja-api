@@ -166,8 +166,12 @@ export default class SocialService {
     await Promise.all(promise);
     await sendNotificationToUser(
       pushNotificationId,
-      `Gist liked`,
       `${user.username} liked your gist`,
+      `${
+        ownerOfPost.body.length > 50
+          ? ownerOfPost.body.slice(0, 50)
+          : ownerOfPost.body
+      }`,
     );
     return { message: 'Post liked' };
   }

@@ -18,11 +18,11 @@ import config from '../../config/default';
 // const serverKey = config.FIREBASE_SERVER_KEY; //put your server key here
 
 const expo = new Expo({ accessToken: config.expoAccessToken });
-
+type priority = 'default' | 'normal' | 'high';
 async function createMessages(
   title: string,
   pushTokens: string[],
-  data?: object,
+  body?: string,
 ) {
   const messages = [];
   for (const pushToken of pushTokens) {
@@ -35,8 +35,9 @@ async function createMessages(
       to: pushToken,
       // sound: 'default',
       title,
-      data: Object.values(data).length > 0 ? data : null,
+      body,
       badge: 1,
+      priority: 'high' as priority,
     });
   }
   return messages;
@@ -127,7 +128,7 @@ async function sendNotificationToUser(
   title: string,
   body?: string,
 ) {
-  const messages = await createMessages(title, deviceIds, { body });
+  const messages = await createMessages(title, deviceIds, body);
   const tickets = await sendMessages(messages);
   const receiptIds = await getReceiptIds(tickets);
   await obtainReceipts(receiptIds);

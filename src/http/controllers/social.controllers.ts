@@ -55,8 +55,8 @@ export default class SocialController {
       const pushNotificationId = await this.notificationId({ postFeed: true });
       await sendNotificationToUser(
         pushNotificationId,
-        `New Gist`,
         `${req.user.fullName} has a new gist for you`,
+        `${post.body.length > 50 ? post.body.slice(0, 50) : post.body}`,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',

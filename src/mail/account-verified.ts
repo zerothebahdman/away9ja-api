@@ -609,8 +609,8 @@ const USER_ACCOUNT_VERIFIED_BY_REFERRER = (fullName: string, email: string) => `
                                           your account was created successfully and
                                           has been fully verified by your
                                           referral.<br /><br />To get you started,
-                                          please click on the button below to log in
-                                          to your account for the first time.
+                                          kindly return to the app and 
+                                          login to continue.
                                         </p>
                                       </div>
                                     </td>

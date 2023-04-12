@@ -5,17 +5,10 @@ import { Gender } from '@prisma/client';
 
 export const LoginValidator = {
   body: Joi.object().keys({
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: { allow: ['com', 'org', 'ng'] },
-      })
-      .lowercase()
-      .required()
-      .messages({
-        'any.email': 'Oops!, you need to provide valid email address',
-        'any.required': 'Oops!, you have to specify an email address',
-      }),
+    email: Joi.string().email().lowercase().required().messages({
+      'any.email': 'Oops!, you need to provide valid email address',
+      'any.required': 'Oops!, you have to specify an email address',
+    }),
     password: Joi.string().min(8).required().messages({
       'string.min': 'Oops!, password must be at least 8 characters long',
       'any.required': 'Oops!, you have to specify a password',
@@ -72,17 +65,10 @@ export const CreateUserValidator = {
 
 export const ResendUserEmailVerificationValidator = {
   body: Joi.object().keys({
-    email: Joi.string()
-      .email({
-        minDomainSegments: 2,
-        tlds: { allow: ['com', 'net'] },
-      })
-      .lowercase()
-      .required()
-      .messages({
-        'string.email': 'Oops!, you need to provide valid email address',
-        'string.required': 'Oops!, you have to specify an email address',
-      }),
+    email: Joi.string().email().lowercase().required().messages({
+      'string.email': 'Oops!, you need to provide valid email address',
+      'string.required': 'Oops!, you have to specify an email address',
+    }),
   }),
 };
 

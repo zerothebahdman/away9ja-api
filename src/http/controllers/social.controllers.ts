@@ -93,6 +93,8 @@ export default class SocialController {
       delete req.body.parent_post_comment_id;
       const commentBody = { user_id: req.user.id, ...req.body };
       const comment = await this.socialService.createComment(commentBody);
+      let subCommentOwnerPushNotificationId;
+      let subComment;
       if (req.body.type === CommentType.SUB_COMMENT) {
         const subCommentBody: Pick<
           ParentChildComment,
@@ -102,24 +104,23 @@ export default class SocialController {
           child_post_comment_id: comment?.id,
         };
         await this.socialService.createSubComment(subCommentBody);
+        subComment = await this.socialService.getCommentById(parentComment);
+
+        const subCommentOwner = await this.userService.getUserById(
+          subComment.user_id,
+        );
+        subCommentOwnerPushNotificationId = await this.notificationId({
+          postFeed: true,
+          userId: subCommentOwner.id,
+        });
       }
       const ownerPost = await this.socialService.queryPostDetailsById(
         req.body.post_id,
       );
-      const subComment = await this.socialService.queryPostDetailsById(
-        parentComment,
-      );
       const postOwner = await this.userService.getUserById(ownerPost.user_id);
-      const subCommentOwner = await this.userService.getUserById(
-        subComment.user_id,
-      );
       const postOwnerPushNotificationId = await this.notificationId({
         postFeed: true,
         userId: postOwner.id,
-      });
-      const subCommentOwnerPushNotificationId = await this.notificationId({
-        postFeed: true,
-        userId: subCommentOwner.id,
       });
       await sendNotificationToUser(
         req.body.type === CommentType.SUB_COMMENT

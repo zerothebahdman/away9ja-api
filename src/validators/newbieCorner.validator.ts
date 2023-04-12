@@ -14,7 +14,7 @@ export const createNewbieArticleValidator = {
       'string.max': 'You have exceeded more than 50 characters',
     }),
     body: Joi.string().min(3).max(1000),
-    newbieTag: Joi.array().items(Joi.string().lowercase()).required(),
+    newbieTag: Joi.array().items(Joi.string()).required(),
     article_position: Joi.number().integer().required(),
   }),
 };
@@ -25,7 +25,7 @@ export const editNewbieArticleValidator = {
       'string.max': 'You have exceeded more than 50 characters',
     }),
     body: Joi.string().min(3).max(1000).optional(),
-    newbieTag: Joi.array().items(Joi.string().lowercase()).optional(),
+    newbieTag: Joi.array().items(Joi.string()).optional(),
     article_position: Joi.number().integer().optional(),
   }),
 };

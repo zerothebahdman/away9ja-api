@@ -33,7 +33,7 @@ export const editItemValidator = {
 
 export const addCategoryValidator = {
   body: Joi.object().keys({
-    name: Joi.string().lowercase().max(50).messages({
+    name: Joi.string().max(50).messages({
       'string.max': 'You have exceeded more than 50 characters',
     }),
   }),
@@ -44,7 +44,7 @@ export const createMarketPlaceCommentValidator = {
     body: Joi.string().max(150).messages({
       'string.max': 'You have exceeded more than 150 characters',
     }),
-    marketPlaceId: Joi.string().min(3).lowercase().max(50).optional(),
+    marketPlaceId: Joi.string().custom(objectId).optional(),
     type: Joi.string().valid('mainComment', 'subComment'),
     parent_market_place_comment_id: Joi.when('type', {
       is: 'subComment',

@@ -126,8 +126,10 @@ export default class SocialController {
         req.body.type === CommentType.SUB_COMMENT
           ? subCommentOwnerPushNotificationId
           : postOwnerPushNotificationId,
-        `${req.user.fullName} has a commented on your ${
-          req.body.type === CommentType.SUB_COMMENT ? 'comment' : 'gist'
+        `${
+          req.body.type === CommentType.SUB_COMMENT
+            ? `${req.user.fullName} made a reply to your comment`
+            : `${req.user.fullName} made a comment on your gist`
         }`,
         `${
           req.body.type === CommentType.SUB_COMMENT

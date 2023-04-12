@@ -36,6 +36,7 @@ async function createMessages(
       // sound: 'default',
       title,
       data: Object.values(data).length > 0 ? data : null,
+      badge: 1,
     });
   }
   return messages;

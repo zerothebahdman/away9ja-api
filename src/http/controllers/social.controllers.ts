@@ -26,21 +26,12 @@ export default class SocialController {
     private readonly socialService: SocialService,
     private readonly userService: UserService,
   ) {}
-
-  async createPost(req: RequestType, res: Response, next: NextFunction) {
-    try {
-      req.body.user_id = req.user.id;
-      req.body.isAnonymous === true
-        ? (req.body.isApproved = false)
-        : (req.body.isApproved = true);
-
-      const post = await this.socialService.createPost(req.body);
-      const whoCanReceiveNotification =
-        await this.userService.getUsersWhoCanReceiveNotification({
-          postFeed: true,
-        });
-      const pushNotificationId: string[] = [];
-      const promise = whoCanReceiveNotification.map(async (user) => {
+  private async notificationId(filter: { postFeed: boolean; userId?: string }) {
+    const whoCanReceiveNotification =
+      await this.userService.getUsersWhoCanReceiveNotification(filter);
+    const pushNotificationId: string[] = [];
+    await Promise.all(
+      whoCanReceiveNotification.map(async (user) => {
         // get who can receive notification
         const userThatCanReceiveNotification =
           await this.userService.getUserById(user.userId);
@@ -49,12 +40,23 @@ export default class SocialController {
             userThatCanReceiveNotification.pushNotificationId,
           );
         }
-      });
-      await Promise.all(promise);
+      }),
+    );
+    return pushNotificationId;
+  }
+  async createPost(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      req.body.user_id = req.user.id;
+      req.body.isAnonymous === true
+        ? (req.body.isApproved = false)
+        : (req.body.isApproved = true);
+
+      const post = await this.socialService.createPost(req.body);
+      const pushNotificationId = await this.notificationId({ postFeed: true });
       await sendNotificationToUser(
         pushNotificationId,
-        `New Post`,
-        `${req.user.fullName} just posted an article`,
+        `New Gist`,
+        `${req.user.fullName} has a new gist for you`,
       );
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
@@ -101,6 +103,42 @@ export default class SocialController {
         };
         await this.socialService.createSubComment(subCommentBody);
       }
+      const ownerPost = await this.socialService.queryPostDetailsById(
+        req.body.post_id,
+      );
+      const subComment = await this.socialService.queryPostDetailsById(
+        parentComment,
+      );
+      const postOwner = await this.userService.getUserById(ownerPost.user_id);
+      const subCommentOwner = await this.userService.getUserById(
+        subComment.user_id,
+      );
+      const postOwnerPushNotificationId = await this.notificationId({
+        postFeed: true,
+        userId: postOwner.id,
+      });
+      const subCommentOwnerPushNotificationId = await this.notificationId({
+        postFeed: true,
+        userId: subCommentOwner.id,
+      });
+      await sendNotificationToUser(
+        req.body.type === CommentType.SUB_COMMENT
+          ? subCommentOwnerPushNotificationId
+          : postOwnerPushNotificationId,
+        `${req.user.fullName} has a commented on your ${
+          req.body.type === CommentType.SUB_COMMENT ? 'comment' : 'gist'
+        }`,
+        `${
+          req.body.type === CommentType.SUB_COMMENT
+            ? subComment.body.length > 50
+              ? subComment.body.slice(0, 50)
+              : subComment.body
+            : ownerPost.body.length > 50
+            ? ownerPost.body.slice(0, 50)
+            : ownerPost.body
+        }`,
+      );
+
       return res.status(httpStatus.ACCEPTED).json({
         status: 'success',
         comment: HelperClass.removeUnwantedProperties(comment, ['deleted_at']),

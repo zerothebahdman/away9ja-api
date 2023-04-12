@@ -36,7 +36,7 @@ export default class EventController {
         };
 
         // sort based on the date that's closer to the current date
-        newData.results.sort((a: any, b: any) => {
+        newData.results.sort((a, b) => {
           const dateA = new Date(a.date);
           const dateB = new Date(b.date);
           const now = new Date();

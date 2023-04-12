@@ -41,6 +41,14 @@ export default class SocialService {
       : await paginate<Post, typeof prisma.post>(filter, options, prisma.post);
     return data;
   }
+
+  async queryPostDetailsById(id: string) {
+    const data = await prisma.post.findUnique({
+      where: { id },
+    });
+    return data;
+  }
+
   async createPost(createBody: Post): Promise<Post> {
     const post: Post = await prisma.post.create({
       data: { ...createBody },
@@ -158,8 +166,8 @@ export default class SocialService {
     await Promise.all(promise);
     await sendNotificationToUser(
       pushNotificationId,
-      `Post liked`,
-      `${user.username} liked your post`,
+      `Gist liked`,
+      `${user.username} liked your gist`,
     );
     return { message: 'Post liked' };
   }

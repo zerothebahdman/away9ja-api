@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// import FirebaseAdmin from 'firebase-admin';
-// import serviceAccount from '../../config/awaynaija-6f74f-firebase-adminsdk-9dckx-958a70a643.json';
 import log from '../logging/logger';
 import {
   Expo,
@@ -10,12 +7,6 @@ import {
   ExpoPushSuccessTicket,
 } from 'expo-server-sdk';
 import config from '../../config/default';
-
-// FirebaseAdmin.initializeApp({
-//   credential: FirebaseAdmin.credential.cert(serviceAccount as any),
-// });
-// const fcm = FirebaseAdmin.messaging();
-// const serverKey = config.FIREBASE_SERVER_KEY; //put your server key here
 
 const expo = new Expo({ accessToken: config.expoAccessToken });
 type priority = 'default' | 'normal' | 'high';
